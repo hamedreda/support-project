@@ -1,8 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 using namespace std;
 using namespace sf;
 int scorec(int& x) {
-	x += 300;
+	x += 10;
 	return x;
 }
 int health1(int& x) {
@@ -24,7 +25,7 @@ int main()
 	RectangleShape r2(Vector2f(250, 20)); r2.setPosition(1000, 15); r2.setFillColor(Color::Red); //HEALTH BAR
 	window.setFramerateLimit(40); //fps
 	Font f; f.loadFromFile("font.ttf"); //FONT
-	int h = 100, s = 0,nav=0; //VARIABLES FOR SCORE , HEALTH & NAVIGATION
+	int h = 100, s = 0, nav = 0; //VARIABLES FOR SCORE , HEALTH & NAVIGATION
 
 						// TEXT FOR SCORE & HEALTH :
 	Text score, health;
@@ -33,7 +34,7 @@ int main()
 	score.setPosition(15, -5);		    health.setPosition(1100, -5);
 	score.setFillColor(Color::Yellow);  health.setFillColor(Color::Yellow);
 	score.setCharacterSize(50);		    health.setCharacterSize(50);
-	
+
 	//################################ Tank and bullets ###################################
 		//1-tank
 	Texture t;
@@ -91,7 +92,17 @@ int main()
 	}
 	endgame[0].setString("Well done soldier");
 	endgame[1].setString("Mission failed succesfully");
-
+	//################sound############
+	//bullet
+	SoundBuffer music2;
+	music2.loadFromFile("shoot.wav");
+	Sound shoot;
+	shoot.setBuffer(music2);
+	//explosion
+	SoundBuffer music;
+	music.loadFromFile("explosion.wav");
+	Sound explosion;
+	explosion.setBuffer(music);
 	while (window.isOpen())
 	{
 
@@ -99,7 +110,7 @@ int main()
 		if (Keyboard::isKeyPressed(Keyboard::Space)) {
 			nav = 1;
 		}
-		if (h == 0) {
+		if (h <= 0) {
 			nav = 2;
 		}
 		if (s == 300) {
@@ -111,111 +122,112 @@ int main()
 			if (event.type == Event::Closed)
 				window.close();
 		}
-	    if(nav==1) {
-		//######################## Movement ###############################
-			//1-tank
-		if (Keyboard::isKeyPressed(Keyboard::Right)) {
-			s1.move(7, 0);
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Left)) {
-			s1.move(-7, 0);
-		}
-		//2-bullet
-		if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
-			fired = 1;
-			s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
-
-		}
-		//repeats bullets's movement
-		if (fired) {
-			s2.move(0, -10);
-		}
-
-		if (s2.getPosition().y < 0) {
-			fired = 0;
-			s2.setPosition(800, 800);
-		}
-
-		//repeat 
-		for (int i = 0; i < 10; i++) //bomb 1
-		{
-			if (b1[i].getPosition().y > 720)
-				b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-		}
-		for (int i = 0; i < 5; i++) //nuke
-		{
-			if (b2[i].getPosition().y > 720)
-				b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-		}
-		for (int i = 0; i < 3; i++) //shield
-		{
-			if (sh[i].getPosition().y > 720)
-				sh[i].setPosition(rand() % 1200, -3600);
-
-		}
-		//move
-		for (int i = 0; i < 10; i++) // bomb1
-		{
-			b1[i].move(0, 8);
-		}
-		for (int i = 0; i < 5; i++)  //nuke
-		{
-			b2[i].move(0, 8);
-		}
-		for (int i = 0; i < 3; i++) //shield
-		{
-			sh[i].move(0, 8);
-		}
-		// #############################collision######################
-		//bombs with the tank
-		for (int i = 0; i < 10; i++) {
-			if (s1.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
-				b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-				h = health1(h);
-				health.setString(to_string(h));
-
+		if (nav == 1) {
+			//######################## Movement ###############################
+				//1-tank
+			if (Keyboard::isKeyPressed(Keyboard::Right)) {
+				s1.move(7, 0);
 			}
-		}
-		//nuke with tank
-		for (int i = 0; i < 5; i++) {
-			if (s1.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
-				b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-				h = health2(h);
-				health.setString(to_string(h));
-
+			if (Keyboard::isKeyPressed(Keyboard::Left)) {
+				s1.move(-7, 0);
 			}
-		}
-		//shield with the tank
-		for (int i = 0; i < 3; i++) {
-			if (s1.getGlobalBounds().intersects(sh[i].getGlobalBounds())) {
-				sh[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-				h = health3(h);
-				health.setString(to_string(h));
-
+			//2-bullet
+			if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
+				fired = 1;
+				s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
+				shoot.play();
 			}
-		}
-		//bullet with nukes
-		for (int i = 0; i < 5; i++) {
-			if (s2.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
-				b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-				s = scorec(s);
-				score.setString(to_string(s));
-				fired = 0;
-				s2.setPosition(800, 800);
-
+			//repeats bullets's movement
+			if (fired) {
+				s2.move(0, -10);
 			}
-		}
-		//bullets with bombs
-		for (int i = 0; i < 10; i++) {
-			if (s2.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
-				b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-				s = scorec(s);
-				score.setString(to_string(s));
+
+			if (s2.getPosition().y < 0) {
 				fired = 0;
 				s2.setPosition(800, 800);
 			}
+
+			//repeat 
+			for (int i = 0; i < 10; i++) //bomb 1
+			{
+				if (b1[i].getPosition().y > 720)
+					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+			}
+			for (int i = 0; i < 5; i++) //nuke
+			{
+				if (b2[i].getPosition().y > 720)
+					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+			}
+			for (int i = 0; i < 3; i++) //shield
+			{
+				if (sh[i].getPosition().y > 720)
+					sh[i].setPosition(rand() % 1200, -3600);
+
+			}
+			//move
+			for (int i = 0; i < 10; i++) // bomb1
+			{
+				b1[i].move(0, 8);
+			}
+			for (int i = 0; i < 5; i++)  //nuke
+			{
+				b2[i].move(0, 8);
+			}
+			for (int i = 0; i < 3; i++) //shield
+			{
+				sh[i].move(0, 8);
+			}
+			// #############################collision######################
+			//bombs with the tank
+			for (int i = 0; i < 10; i++) {
+				if (s1.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
+					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					h = health1(h);
+					health.setString(to_string(h));
+
+				}
+			}
+			//nuke with tank
+			for (int i = 0; i < 5; i++) {
+				if (s1.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
+					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					h = health2(h);
+					health.setString(to_string(h));
+
+				}
+			}
+			//shield with the tank
+			for (int i = 0; i < 3; i++) {
+				if (s1.getGlobalBounds().intersects(sh[i].getGlobalBounds())) {
+					sh[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					h = health3(h);
+					health.setString(to_string(h));
+
+				}
+			}
+			//bullet with nukes
+			for (int i = 0; i < 5; i++) {
+				if (s2.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
+					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					s = scorec(s);
+					score.setString(to_string(s));
+					fired = 0;
+					s2.setPosition(800, 800);
+					explosion.play();
+				}
+			}
+			//bullets with bombs
+			for (int i = 0; i < 10; i++) {
+				if (s2.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
+					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					s = scorec(s);
+					score.setString(to_string(s));
+					fired = 0;
+					s2.setPosition(800, 800);
+					explosion.play();
+				}
+			}
 		}
-	}
 		//drawing :
 		window.clear();
 		if (nav == 1) {
@@ -240,7 +252,7 @@ int main()
 			if (s == 300) {
 				window.draw(endgame[0]);
 			}
-			if (h == 0) {
+			if (h <= 0) {
 				window.draw(endgame[1]);
 			}
 		}
