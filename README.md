@@ -1,7 +1,8 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 using namespace std;
 using namespace sf;
-int scorec(int &x) {
+int scorec(int& x) {
 	x += 10;
 	return x;
 }
@@ -13,14 +14,19 @@ int health2(int& x) {
 	x -= 30;
 	return x;
 }
+int health3(int& x) {
+	if (x == 100)
+		return 100;
+	x += 10;
+	return x;
+}
+	RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
 int main()
 {
-	RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
-	RectangleShape r1(Vector2f(1280, 5)); r1.setPosition(0, 50); //WHITE LINE
-	RectangleShape r2(Vector2f(250, 20)); r2.setPosition(1000, 15); r2.setFillColor(Color::Red); //HEALTH BAR
+	int a = 250; //for HEALTH BAR
 	window.setFramerateLimit(40); //fps
 	Font f; f.loadFromFile("font.ttf"); //FONT
-	int h = 100, s = 0; //VARIABLES FOR SCORE & HEALTH
+	int h = 100, s = 0, nav = 0; //VARIABLES FOR SCORE , HEALTH & NAVIGATION
 
 						// TEXT FOR SCORE & HEALTH :
 	Text score, health;
@@ -60,7 +66,7 @@ int main()
 		b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
 		b1[i].setScale(0.09, 0.09);
 	}
-	Sprite b2[5]; //bomb2
+	Sprite b2[5]; //nuke
 	for (int i = 0; i < 5; i++)
 	{
 		b2[i].setTexture(t2);
@@ -75,87 +81,223 @@ int main()
 		sh[i].setScale(0.03, 0.03);
 	}
 	bool fired = 0;
+	//game's starting & ending txt + intro & game bg
+	Texture ti, tg;
+	ti.loadFromFile("intro.jpg"); tg.loadFromFile("game.jpg");
+	Sprite ibg, gbg;
+	ibg.setTexture(ti);
+	gbg.setTexture(tg);
+	Font ending;
+	ending.loadFromFile("endgame.ttf");
+	Text strtgame;	Text endgame[2];
+	for (int i = 0; i < 2; i++) {
+		endgame[i].setFont(ending);
+		endgame[i].setCharacterSize(65);
+		endgame[i].setPosition(300, 300);
+		endgame[i].setFillColor(sf::Color::Red);
+	}
+	strtgame.setFont(ending);
+	strtgame.setCharacterSize(50);
+	strtgame.setPosition(200, 300);
+	strtgame.setString("press ENTER when you are ready to play");
+	endgame[0].setString("Well done soldier");
+	endgame[1].setString("Mission failed succesfully");
+	//################sound############
+	//bullet
+	SoundBuffer music2;
+	music2.loadFromFile("shoot.wav");
+	Sound shoot;
+	shoot.setBuffer(music2);
+	//explosion
+	SoundBuffer music1;
+	music1.loadFromFile("explosion.wav");
+	Sound explosion;
+	explosion.setBuffer(music1);
+	//game
+	Music music;
+	music.openFromFile("Game audio1.wav");
+	music.setLoop("Game audio1.wav");
+	music.play();
 
 	while (window.isOpen())
 	{
+		RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1000, 15); r2.setFillColor(Color::Red); //HEALTH BAR
+
+			// transporting through windows
+		if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+			nav = 1;
+		}
+		if (h <= 0) {
+			nav = 2;
+		}
+		
 		Event event; //to close window
 		while (window.pollEvent(event))
 		{
 			if (event.type == Event::Closed)
 				window.close();
 		}
-		//######################## Movement ###############################
-			//1-tank
-		if (Keyboard::isKeyPressed(Keyboard::Right)) {
-			s1.move(7, 0);
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Left)) {
-			s1.move(-7, 0);
-		}
-		//2-bullet
-		if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
-			fired = 1;
-			s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
+		if (nav == 1) {
+			//######################## Movement ###############################
+				//1-tank
+			if (Keyboard::isKeyPressed(Keyboard::Right)) {
+				s1.move(7, 0);
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Left)) {
+				s1.move(-7, 0);
+			}
+			//2-bullet
+			if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
+				fired = 1;
+				s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
+				shoot.play();
+			}
+			//repeats bullets's movement
+			if (fired) {
+				s2.move(0, -10);
+			}
 
-		}
-		//repeats bullets's movement
-		if (fired) {
-			s2.move(0, -10);
-		}
+			if (s2.getPosition().y < 0) {
+				fired = 0;
+				s2.setPosition(800, 800);
+			}
 
-		if (s2.getPosition().y < 0) {
-			fired = 0;
-			s2.setPosition(800, 800);
-		}
+			//repeat 
+			for (int i = 0; i < 10; i++) //bomb 1
+			{
+				if (b1[i].getPosition().y > 720)
+					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+			}
+			for (int i = 0; i < 5; i++) //nuke
+			{
+				if (b2[i].getPosition().y > 720)
+					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+			}
+			for (int i = 0; i < 3; i++) //shield
+			{
+				if (sh[i].getPosition().y > 720)
+					sh[i].setPosition(rand() % 1200, -3600);
 
-		//repeat 
-		for (int i = 0; i < 10; i++) //bomb 1
-		{
-			if (b1[i].getPosition().y > 720)
-				b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-		}
-		for (int i = 0; i < 5; i++) //bomb 2
-		{
-			if (b2[i].getPosition().y > 720)
-				b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-		}
-		for (int i = 0; i < 3; i++) //shield
-		{
-			if (sh[i].getPosition().y > 720)
-				sh[i].setPosition(rand() % 1200, -3600);
-		}
-		//move
-		for (int i = 0; i < 10; i++) // bomb1
-		{
-			b1[i].move(0, 4);
-		}
-		for (int i = 0; i < 5; i++)  //bomb2
-		{
-			b2[i].move(0, 4);
-		}
-		for (int i = 0; i < 3; i++) //shield
-		{
-			sh[i].move(0, 4);
-		}
+			}
+			//move
+			for (int i = 0; i < 10; i++) // bomb1
+			{
+				b1[i].move(0, 8);
+			}
+			for (int i = 0; i < 5; i++)  //nuke
+			{
+				b2[i].move(0, 8);
+			}
+			for (int i = 0; i < 3; i++) //shield
+			{
+				sh[i].move(0, 8);
+			}
+			// #############################collision######################
+			//tank and window
 
+			//bombs with the tank
+			for (int i = 0; i < 10; i++) {
+				if (s1.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
+					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					h = health1(h);
+					health.setString(to_string(h));
+					a -= 25;
+					explosion.play();
+				}
+			}
+			//nuke with tank
+			for (int i = 0; i < 5; i++) {
+				if (s1.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
+					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					h = health2(h);
+					health.setString(to_string(h));
+					a -= 75;
+					explosion.play();
+				}
+			}
+			//shield with the tank
+			for (int i = 0; i < 3; i++) {
+				if (s1.getGlobalBounds().intersects(sh[i].getGlobalBounds())) {
+					sh[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					h = health3(h);
+					health.setString(to_string(h));
+					if (a < 250)
+						a += 25;
+				}
+			}
+			//bullet with nukes
+			for (int i = 0; i < 5; i++) {
+				if (s2.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
+					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					s = scorec(s);
+					score.setString(to_string(s));
+					fired = 0;
+					s2.setPosition(800, 800);
+					explosion.play();
+				}
+			}
+			//bullets with bombs
+			for (int i = 0; i < 10; i++) {
+				if (s2.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
+					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					s = scorec(s);
+					score.setString(to_string(s));
+					fired = 0;
+					s2.setPosition(800, 800);
+					explosion.play();
+				}
+			}
+			//bullets with shields
+			for (int i = 0; i < 3; i++)
+			{
+				if (s2.getGlobalBounds().intersects(sh[i].getGlobalBounds())) {
+					sh[i].setPosition(rand() % 1200, -3600);
+					fired = 0;
+					s2.setPosition(1800, 800);
+					explosion.play();
+				}
+			}
+		}
+		if (nav == 2) {
+			music.stop();
+			if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+				main();
+			}
+		}
 		//drawing :
 		window.clear();
-		window.draw(s1);
-		window.draw(s2);
-		for (int i = 0; i < 10; i++) //bomb 1
-		{
-			window.draw(b1[i]);
+		if (nav == 0) {
+			window.draw(ibg);
+			window.draw(strtgame);
 		}
-		for (int i = 0; i < 5; i++) //bomb 2
-		{
-			window.draw(b2[i]);
+		if (nav == 1) {
+			window.draw(gbg);
+			window.draw(s1);
+			window.draw(s2);
+			for (int i = 0; i < 10; i++) //bomb 1
+			{
+				window.draw(b1[i]);
+			}
+			for (int i = 0; i < 5; i++) //bomb 2
+			{
+				window.draw(b2[i]);
+			}
+			for (int i = 0; i < 3; i++) //shield
+			{
+				window.draw(sh[i]);
+			}
+			//window.draw(r1);
+			window.draw(r2);
+			window.draw(score);	window.draw(health);
 		}
-		for (int i = 0; i < 3; i++) //shield
-		{
-			window.draw(sh[i]);
+		if (nav == 2) {
+			if (s == 300) {
+				window.draw(endgame[0]);
+			}
+			if (h <= 0) {
+				window.draw(endgame[1]);
+			}
 		}
-		window.draw(r1);	window.draw(r2);
-		window.draw(score);	window.draw(health);
 		window.display();
 	}
 
