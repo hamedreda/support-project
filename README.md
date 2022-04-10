@@ -1,304 +1,177 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-using namespace std;
+#include "SFML/Graphics.hpp"
 using namespace sf;
-int scorec(int& x) {
-	x += 10;
-	return x;
-}
-int health1(int& x) {
-	x -= 10;
-	return x;
-}
-int health2(int& x) {
-	x -= 30;
-	return x;
-}
-int health3(int& x) {
-	if (x == 100)
-		return 100;
-	x += 10;
-	return x;
-}
+using namespace std;
+
 int main()
 {
-	RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
-	//RectangleShape r1(Vector2f(1280, 5)); r1.setPosition(0, 50); //WHITE LINE
-	int a=250; //for HEALTH BAR
-	window.setFramerateLimit(40); //fps
-	Font f; f.loadFromFile("font.ttf"); //FONT
-	int h = 100, s = 0, nav = 0; //VARIABLES FOR SCORE , HEALTH & NAVIGATION
+	RenderWindow window(VideoMode(1280, 720), "WarTanks");
+	
+	int nav = 0; bool pause = 0;//  navigation and pause game 
 
-						// TEXT FOR SCORE & HEALTH :
-	Text score, health;
-	score.setFont(f);					health.setFont(f);
-	score.setString(to_string(s));	    health.setString(to_string(h));
-	score.setPosition(15, -5);		    health.setPosition(1100, -5);
-	score.setFillColor(Color::Yellow);  health.setFillColor(Color::Yellow);
-	score.setCharacterSize(50);		    health.setCharacterSize(50);
-
-	//################################ Tank and bullets ###################################
-		//1-tank
-	Texture t;
-	t.loadFromFile("Tank.png");
-	Sprite s1(t);
-	s1.setTexture(t);
-	s1.setScale(0.2, 0.2);
-	s1.setPosition(20, 600);
-	//2-bullets
-	Texture t4;
-	t4.loadFromFile("bullet.png");
-	Sprite s2(t4);
-	s2.setTexture(t4);
-	s2.setScale(0.025, 0.025);
-	s2.setPosition(800, 720);
-
-	// TEXTURES FOR BOMBS & SHIELD
-	Texture t1, t2, t3;
-	t1.loadFromFile("bomb1.png"); 	t2.loadFromFile("bomb2.png"); 	t3.loadFromFile("shield.png");
-
-	srand(time(0)); //for random positions 
-
-	// spr arr FOR BOMBS& SHIELD
-	Sprite b1[10]; //bomb1
-	for (int i = 0; i < 10; i++)
-	{
-		b1[i].setTexture(t1);
-		b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
-		b1[i].setScale(0.09, 0.09);
-	}
-	Sprite b2[5]; //nuke
-	for (int i = 0; i < 5; i++)
-	{
-		b2[i].setTexture(t2);
-		b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
-		b2[i].setScale(0.1, 0.1);
-	}
-	Sprite sh[3]; //shield
+	Texture ti;
+	ti.loadFromFile("intro.jpg"); 
+	Sprite ibg;
+	ibg.setTexture(ti);
+	
+	//$$$$$$$ the cover that holds the text inside it $$$$$$$$$
+	Texture textcover; 
+	textcover.loadFromFile("tank-game after ps.png");
+	Sprite textCover[6];
+	//############# Main menu ###############
 	for (int i = 0; i < 3; i++)
 	{
-		sh[i].setTexture(t3);
-		sh[i].setPosition(rand() % 1200, -1440 * (i + 1));
-		sh[i].setScale(0.03, 0.03);
+		textCover[i].setScale(1.3,1);
+		textCover[i].setTexture(textcover);
 	}
-	bool fired = 0;
-	//game's starting & ending txt + intro & game bg
-	Texture ti, tg;
-	ti.loadFromFile("intro.jpg"); tg.loadFromFile("game.jpg");
-	Sprite ibg, gbg;
-	ibg.setTexture(ti);
-	gbg.setTexture(tg);
-	Font ending;
-	ending.loadFromFile("endgame.ttf");
-	Text strtgame;	Text endgame[2];
-	for (int i = 0; i < 2; i++) {
-		endgame[i].setFont(ending);
-		endgame[i].setCharacterSize(65);
-		endgame[i].setPosition(300, 300);
-		endgame[i].setFillColor(sf::Color::Red);
+	textCover[0].setPosition(0, 0);
+	textCover[1].setPosition(0, 100);
+	textCover[2].setPosition(0, 200);
+	
+	//############# Campaign menu ############## 
+	for (int i = 3; i < 6; i++) 
+	{
+		textCover[i].setScale(2, 2);
+		textCover[i].setTexture(textcover);
 	}
-	strtgame.setFont(ending);
-	strtgame.setCharacterSize(50);
-	strtgame.setPosition(200, 300);
-	strtgame.setString("press ENTER when you are ready to play");
-	endgame[0].setString("Well done soldier");
-	endgame[1].setString("Mission failed succesfully");
-	//################sound############
-	//bullet
-	SoundBuffer music2;
-	music2.loadFromFile("shoot.wav");
-	Sound shoot;
-	shoot.setBuffer(music2);
-	//explosion
-	SoundBuffer music1;
-	music1.loadFromFile("explosion.wav");
-	Sound explosion;
-	explosion.setBuffer(music1);
-	//game
-	Music music;   
-	music.openFromFile("Game audio1.wav");
-	music.setLoop("Game audio1.wav");
-	music.play();
+	textCover[3].setPosition(0, 0);
+	textCover[4].setPosition(0, 200);
+	textCover[5].setPosition(0, 400);
 
+	//############ main menu text ############
+	Font font;		  Text mmt[6];		bool color = 0;
+	font.loadFromFile("Top Secret Stamp.ttf");
+
+	for (int i = 0; i < 3; i++)
+	{
+		mmt[i].setFont(font);
+		mmt[i].setCharacterSize(48);
+		mmt[i].setStyle(Text::Bold);
+	}
+
+	mmt[0].setString("Campaign");			mmt[1].setString("Survival");		mmt[2].setString("Exit");
+	mmt[0].setPosition(47, 15);				mmt[1].setPosition(65, 115);		mmt[2].setPosition(100, 215);
+
+	for (int i = 3; i < 6; i++) // text in campaign menu
+	{
+		mmt[i].setFont(font);
+		mmt[i].setCharacterSize(50);
+		mmt[i].setStyle(Text::Bold);
+	}
+	mmt[3].setString("Scorched Earth");			mmt[4].setString("Ashes To Ashes");		mmt[5].setString("End of the Line");
+	mmt[3].setPosition(67, 70);					mmt[4].setPosition(67, 270);			mmt[5].setPosition(67, 470);
+	
+	
+	
 	while (window.isOpen())
 	{
-	RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1000, 15); r2.setFillColor(Color::Red); //HEALTH BAR
-
-		// transporting through windows
-		if (Keyboard::isKeyPressed(Keyboard::Enter)) {
-			nav = 1;
-		}
-		if (h <= 0) {
-			nav = 2;
-		}
-		if (s >= 300) {
-			nav = 2;
-		}
-		Event event; //to close window
+		Event event;
 		while (window.pollEvent(event))
 		{
 			if (event.type == Event::Closed)
 				window.close();
 		}
-		if (nav == 1) {
-			//######################## Movement ###############################
-				//1-tank
-			if (Keyboard::isKeyPressed(Keyboard::Right)) {
-				s1.move(7, 0);
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Left)) {
-				s1.move(-7, 0);
-			}
-			//2-bullet
-			if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
-				fired = 1;
-				s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
-				shoot.play();
-			}
-			//repeats bullets's movement
-			if (fired) {
-				s2.move(0, -10);
-			}
 
-			if (s2.getPosition().y < 0) {
-				fired = 0;
-				s2.setPosition(800, 800);
-			}
+		Vector2i mousepos = Mouse::getPosition(window);//to get position of mouse relative to window "easier than {Mouse ms;}"
+		// change color of campaign text
+		{
+			if (mousepos.x > 45 && mousepos.x < 255 && mousepos.y>25 && mousepos.y < 76 && nav == 0)
+				color = 1;
+			else 			color = 0;
 
-			//repeat 
-			for (int i = 0; i < 10; i++) //bomb 1
-			{
-				if (b1[i].getPosition().y > 720)
-					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-			}
-			for (int i = 0; i < 5; i++) //nuke
-			{
-				if (b2[i].getPosition().y > 720)
-					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-			}
-			for (int i = 0; i < 3; i++) //shield
-			{
-				if (sh[i].getPosition().y > 720)
-					sh[i].setPosition(rand() % 1200, -3600);
+			if (!color)		mmt[0].setFillColor(Color::White);
+			if (color)		mmt[0].setFillColor(Color::Blue);
+		}
+		// change color of survival text
+		{
+			if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>125 && mousepos.y < 164 && nav == 0)
+				color = 1;
+			else 			color = 0;
 
-			}
-			//move
-			for (int i = 0; i < 10; i++) // bomb1
-			{
-				b1[i].move(0, 8);
-			}
-			for (int i = 0; i < 5; i++)  //nuke
-			{
-				b2[i].move(0, 8);
-			}
-			for (int i = 0; i < 3; i++) //shield
-			{
-				sh[i].move(0, 8);
-			}
-			// #############################collision######################
-			//tank and window
-			
-			//bombs with the tank
-			for (int i = 0; i < 10; i++) {
-				if (s1.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
-					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					h = health1(h);
-					health.setString(to_string(h));
-					a -= 25;
-					explosion.play();
-				}
-			}
-			//nuke with tank
-			for (int i = 0; i < 5; i++) {
-				if (s1.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
-					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					h = health2(h);
-					health.setString(to_string(h));
-					a -= 75;
-					explosion.play();
-				}
-			}
-			//shield with the tank
-			for (int i = 0; i < 3; i++) {
-				if (s1.getGlobalBounds().intersects(sh[i].getGlobalBounds())) {
-					sh[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					h = health3(h);
-					health.setString(to_string(h));
-				  if (a<250)
-					a += 25;
-				}
-			}
-			//bullet with nukes
-			for (int i = 0; i < 5; i++) {
-				if (s2.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
-					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					s = scorec(s);
-					score.setString(to_string(s));
-					fired = 0;
-					s2.setPosition(800, 800);
-					explosion.play();
-				}
-			}
-			//bullets with bombs
-			for (int i = 0; i < 10; i++) {
-				if (s2.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
-					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					s = scorec(s);
-					score.setString(to_string(s));
-					fired = 0;
-					s2.setPosition(800, 800);
-					explosion.play();
-				}
-			}
-			//bullets with shields
+			if (!color)		mmt[1].setFillColor(Color::White);
+			if (color)		mmt[1].setFillColor(Color::Blue);
+		}
+		// change color of exit text
+		{
+			if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>227 && mousepos.y < 268 && nav == 0)
+				color = 1;
+			else            color = 0;
+
+			if (!color)		mmt[2].setFillColor(Color::White);
+			if (color)		mmt[2].setFillColor(Color::Blue);
+		}
+		// change color of scorched earth text
+		{
+			if (mousepos.x > 67 && mousepos.x < 393 && mousepos.y>78 && mousepos.y < 120 && nav == 1)
+				color = 1;
+			else 			color = 0;
+
+			if (!color)		mmt[3].setFillColor(Color::White);
+			if (color)		mmt[3].setFillColor(Color::Blue);
+		}
+		// change color of ashes to ashes text
+		{
+			if (mousepos.x > 67 && mousepos.x < 390 && mousepos.y>278 && mousepos.y < 320 && nav == 1)
+				color = 1;
+			else 			color = 0;
+
+			if (!color)		mmt[4].setFillColor(Color::White);
+			if (color)		mmt[4].setFillColor(Color::Blue);
+		}
+		// change color of end of the line text
+		{
+			if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520 && nav == 1)
+				color = 1;
+			else            color = 0;
+
+			if (!color)		mmt[5].setFillColor(Color::White);
+			if (color)		mmt[5].setFillColor(Color::Blue);
+		}
+
+		//################# Navigation ##################
+		if (Mouse::isButtonPressed(Mouse::Left))
+		{
+			if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80 && nav==0 )   nav = 1; //from main menu to campaign "click on campaign"
+			if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>125 && mousepos.y < 164 && nav == 0)  nav = 2; //from main menu to survival "click on survival"
+			if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>227 && mousepos.y < 268 && nav == 0) window.close(); //exit from main menu "click on exit"
+			if (mousepos.x > 67 && mousepos.x < 393 && mousepos.y>78 && mousepos.y < 120 && nav == 1) nav = 11;//play scorched earth  "1st level"
+			if (mousepos.x > 67 && mousepos.x < 390 && mousepos.y>278 && mousepos.y < 320 && nav == 1)nav = 12;//play ashes to ashes  "2nd level"
+			if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520 && nav == 1)nav = 13;//play end of the line "3rd level"
+		}
+		// ################ pause menu and go back###########
+		if (Keyboard::isKeyPressed(Keyboard::Escape))
+		{
+			if (nav == 0) window.close();  //close game from main menu
+			if (nav == 1)nav = 0;// go from campaign menu to main menu
+			if (nav == 2 || nav == 11 || nav == 12 || nav == 13) bool pause = 1; //pause the game
+
+		}
+		if (pause)
+			RenderWindow pause(VideoMode(640, 360), "Pause Menu");
+
+		
+		
+		//#################### draw ###################
+		window.clear();
+		if (nav == 0)
+		{
+			window.draw(ibg);
 			for (int i = 0; i < 3; i++)
 			{
-				if (s2.getGlobalBounds().intersects(sh[i].getGlobalBounds())) {
-					sh[i].setPosition(rand() % 1200, -3600);
-					fired = 0;
-					s2.setPosition(1800, 800);
-					explosion.play();
-				}
+				window.draw(textCover[i]);
+				window.draw(mmt[i]);
 			}
+			
 		}
-		if (nav == 2)
-			music.stop();
-		//drawing :
-		window.clear();
-		if (nav == 0) {
+		if (nav == 1)
+		{
 			window.draw(ibg);
-			window.draw(strtgame);
-		}
-		if (nav == 1) {
-			window.draw(gbg);
-			window.draw(s1);
-			window.draw(s2);
-			for (int i = 0; i < 10; i++) //bomb 1
+			for (int i = 3; i < 6; i++)
 			{
-				window.draw(b1[i]);
-			}
-			for (int i = 0; i < 5; i++) //bomb 2
-			{
-				window.draw(b2[i]);
-			}
-			for (int i = 0; i < 3; i++) //shield
-			{
-				window.draw(sh[i]);
-			}
-			//window.draw(r1);
-			window.draw(r2);
-			window.draw(score);	window.draw(health);
-		}
-		if (nav == 2) {
-			if (s == 300) {
-				window.draw(endgame[0]);
-			}
-			if (h <= 0) {
-				window.draw(endgame[1]);
+				window.draw(textCover[i]);
+				window.draw(mmt[i]);
 			}
 		}
 		window.display();
 	}
-
 	return 0;
 }
