@@ -3,6 +3,11 @@
 #include<iostream>
 using namespace std;
 using namespace sf;
+struct player//struct for the tank
+{
+	int h = 100;
+	int s = 0;
+}tank;
 int scorec(int& x) {
 	x += 10;
 	return x;
@@ -42,18 +47,18 @@ void setter() {
 }
 RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
 int main()
-{//counter for boundries 
+{	//counter for boundries 
 	bool bound = 1;
 	int reqscore = 200;
 	int a = 250; //for HEALTH BAR
 	window.setFramerateLimit(40); //fps
 	Font f; f.loadFromFile("font.ttf"); //FONT
-	int h = 100, s = 0, nav = 0; //VARIABLES FOR SCORE , HEALTH & NAVIGATION
+	int nav = 0; //VARIABLE FOR NAVIGATION
 
 						// TEXT FOR SCORE & HEALTH :
 	Text score, health;
 	score.setFont(f);					health.setFont(f);
-	score.setString(to_string(s));	    health.setString(to_string(h));
+	score.setString(to_string(tank.s));	    health.setString(to_string(tank.h));
 	score.setPosition(15, -5);		    health.setPosition(1100, -5);
 	score.setFillColor(Color::Yellow);  health.setFillColor(Color::Yellow);
 	score.setCharacterSize(50);		    health.setCharacterSize(50);
@@ -149,7 +154,7 @@ int main()
 		if (Keyboard::isKeyPressed(Keyboard::Enter)) {
 			nav = 1;
 		}
-		if (h <= 0) {
+		if (tank.h <= 0) {
 			nav = 2;
 		}
 		//######################### levels #####################
@@ -158,10 +163,10 @@ int main()
 			reqscore += 50;
 			s1.setPosition(20, 600);
 			setter();
-			s = 0;
-			score.setString(to_string(s));
+			tank.s = 0;
+			score.setString(to_string(tank.s));
 		}
-		if (s >= reqscore) {
+		if (tank.s >= reqscore) {
 			bound = 0;
 			
 		}
@@ -266,8 +271,8 @@ int main()
 			for (int i = 0; i < 10; i++) {
 				if (s1.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
 					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					h = health1(h);
-					health.setString(to_string(h));
+					tank.h = health1(tank.h);
+					health.setString(to_string(tank.h));
 					a -= 25;
 					explosion.play();
 				}
@@ -276,8 +281,8 @@ int main()
 			for (int i = 0; i < 5; i++) {
 				if (s1.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
 					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					h = health2(h);
-					health.setString(to_string(h));
+					tank.h = health2(tank.h);
+					health.setString(to_string(tank.h));
 					a -= 75;
 					explosion.play();
 				}
@@ -286,8 +291,8 @@ int main()
 			for (int i = 0; i < 3; i++) {
 				if (s1.getGlobalBounds().intersects(sh[i].getGlobalBounds())) {
 					sh[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					h = health3(h);
-					health.setString(to_string(h));
+					tank.h = health3(tank.h);
+					health.setString(to_string(tank.h));
 					if (a < 250)
 						a += 25;
 				}
@@ -296,8 +301,8 @@ int main()
 			for (int i = 0; i < 5; i++) {
 				if (s2.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
 					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					s = scorec(s);
-					score.setString(to_string(s));
+					tank.s = scorec(tank.s);
+					score.setString(to_string(tank.s));
 					fired = 0;
 					s2.setPosition(800, 800);
 					explosion.play();
@@ -307,8 +312,8 @@ int main()
 			for (int i = 0; i < 10; i++) {
 				if (s2.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
 					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					s = scorec(s);
-					score.setString(to_string(s));
+					tank.s = scorec(tank.s);
+					score.setString(to_string(tank.s));
 					fired = 0;
 					s2.setPosition(800, 800);
 					explosion.play();
@@ -358,10 +363,10 @@ int main()
 			window.draw(score);	window.draw(health);
 		}
 		if (nav == 2) {
-			if (s == 300) {
+			if (tank.s == 300) {
 				window.draw(endgame[0]);
 			}
-			if (h <= 0) {
+			if (tank.h <= 0) {
 				window.draw(endgame[1]);
 			}
 		}
