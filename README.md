@@ -3,11 +3,33 @@
 using namespace sf;
 using namespace std;
 
+Sprite b1[10], b2[5], sh[3], ss;// spr arr FOR BOMBS& SHIELD,apple
+void setter() {
+	//bomb1
+	for (int i = 0; i < 10; i++)
+	{
+		b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
+	}
+	//nuke
+	for (int i = 0; i < 5; i++)
+	{
+		b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
+	}
+	//apple
+	for (int i = 0; i < 3; i++)
+	{
+		sh[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
+	}
+	//SHIELD
+	ss.setPosition(rand() % 1200, -5040);
+}
 RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
 int main()
 {
 
 	window.setFramerateLimit(40); //fps
+	int reqscore = 200;
+	bool bound = 1;	//for boundries 
 	int nav = 0; bool pause = 0;//  navigation and pause game 
 	int a = 250, b = 0; //for HEALTH,SHEILD BAR
 	int h = 100, shi = 0, s = 0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE  
@@ -48,22 +70,22 @@ int main()
 
 	srand(time(0)); //for random positions 
 
-	// spr arr FOR BOMBS& SHIELD,apple
-	Sprite b1[10]; //bomb1
+	// ........................  BOMBS& SHIELD,apple  .................................
+	 //bomb1
 	for (int i = 0; i < 10; i++)
 	{
 		b1[i].setTexture(t1);
 		b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
 		b1[i].setScale(0.07, 0.07);
 	}
-	Sprite b2[5]; //nuke
+	 //nuke
 	for (int i = 0; i < 5; i++)
 	{
 		b2[i].setTexture(t2);
 		b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
 		b2[i].setScale(0.1, 0.1);
 	}
-	Sprite sh[3]; //apple
+	 //apple
 	for (int i = 0; i < 3; i++)
 	{
 		sh[i].setTexture(t5);
@@ -71,7 +93,7 @@ int main()
 		sh[i].setScale(0.1, 0.1);
 	}
 	//sheild
-	Sprite ss(t3);
+	ss.setTexture(t3);
 	ss.setPosition(rand() % 1200, -5040);
 	ss.setScale(0.03, 0.03);
 	//boosters
@@ -180,6 +202,8 @@ int main()
 				window.close();
 		}
 		Vector2i mousepos = Mouse::getPosition(window);//to get position of mouse relative to window "easier than {Mouse ms;}"
+
+		//....................main..menu......
 		if (nav == 0)
 		{
 			// change color of campaign text
@@ -217,7 +241,7 @@ int main()
 				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>227 && mousepos.y < 268) window.close(); //exit from main menu "click on exit"
 			}
 		}
-
+		//.................campaign..mode..menu......
 		if (nav == 1)
 		{
 			// change color of scorched earth text
@@ -255,24 +279,47 @@ int main()
 				if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520)nav = 13;//play end of the line "3rd level"
 			}
 		}
-
-		// ################ pause menu and go back ###########
-		if (Keyboard::isKeyPressed(Keyboard::Escape))
-		{
-			if (nav == 1)nav = 0;// go from campaign menu to main menu
-			if (nav == 2 || nav == 11 || nav == 12 || nav == 13) bool pause = 1; //pause the game
+		if (nav == 11) {
+			if (s >= reqscore) {
+				bound = 0;
+				setter();
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280) {
+				bound = 1;
+				s1.setPosition(20, 600);
+				s = 0;
+				score.setString(to_string(s));
+				nav = 12;
+			}
 		}
-		if (pause)
-			RenderWindow pause(VideoMode(640, 360), "Pause Menu");
-
-		if (h <= 0) 
-			nav = 3;
-		
-		if (shi <= 0)
-			shon = 0;
-
-
-		if (nav == 2) {
+		if (nav == 12) {
+			reqscore = 250;
+			if (s >= reqscore) {
+				bound = 0;
+				setter();
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280) {
+				bound = 1;
+				s1.setPosition(20, 600);
+				s = 0;
+				score.setString(to_string(s));
+				nav = 13;
+			}
+		}
+		if (nav == 13) {
+			reqscore = 300;
+			if (s >= reqscore) {
+				nav = 3;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280) {
+				bound = 1;
+				s1.setPosition(20, 600);
+				s = 0;
+				score.setString(to_string(s));
+			}
+		}
+		//.................game.....
+		if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
 			//######################## Movement ###############################
 				//1-tank
 			if (Keyboard::isKeyPressed(Keyboard::Right)) {
@@ -281,66 +328,68 @@ int main()
 			if (Keyboard::isKeyPressed(Keyboard::Left)) {
 				s1.move(tc * -7, 0);
 			}
-			//2-bullet
-			if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
-				fired = 1;
-				s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
-				shoot.play();
-			}
-			//repeats bullets's movement
-			if (fired) {
-				s2.move(0, -10 * bc);
-			}
 
-			if (s2.getPosition().y < 0) {
-				fired = 0;
-				s2.setPosition(800, 800);
-			}
+			if (bound) {
+				//2-bullet
+				if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
+					fired = 1;
+					s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
+					shoot.play();
+				}
+				//repeats bullets's movement
+				if (fired) {
+					s2.move(0, -10 * bc);
+				}
 
-			//repeat bombs&powerups movement
-			for (int i = 0; i < 10; i++) //bomb 1
-			{
-				if (b1[i].getPosition().y > 720)
-					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-			}
-			for (int i = 0; i < 5; i++) //nuke
-			{
-				if (b2[i].getPosition().y > 720)
-					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-			}
-			for (int i = 0; i < 3; i++) //apple
-			{
-				if (sh[i].getPosition().y > 720)
-					sh[i].setPosition(rand() % 1200, -3600);
+				if (s2.getPosition().y < 0) {
+					fired = 0;
+					s2.setPosition(800, 800);
+				}
 
-			}
-			if (ss.getPosition().y > 720)//shield
-				ss.setPosition(rand() % 1200, -5040);
+				//repeat bombs&powerups movement
+				for (int i = 0; i < 10; i++) //bomb 1
+				{
+					if (b1[i].getPosition().y > 720)
+						b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+				}
+				for (int i = 0; i < 5; i++) //nuke
+				{
+					if (b2[i].getPosition().y > 720)
+						b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+				}
+				for (int i = 0; i < 3; i++) //apple
+				{
+					if (sh[i].getPosition().y > 720)
+						sh[i].setPosition(rand() % 1200, -3600);
 
-			if (tb.getPosition().y > 720)//tank booster
-				tb.setPosition(rand() % 1200, -7200);
+				}
+				if (ss.getPosition().y > 720)//shield
+					ss.setPosition(rand() % 1200, -5040);
 
-			if (bb.getPosition().y > 720)//bullet booster
-				bb.setPosition(rand() % 1200, -6480);
-			//move
-			for (int i = 0; i < 10; i++) // bomb1
-			{
-				b1[i].move(0, 8);
+				//move
+				for (int i = 0; i < 10; i++) // bomb1
+				{
+					b1[i].move(0, 8);
+				}
+				for (int i = 0; i < 5; i++)  //nuke
+				{
+					b2[i].move(0, 8);
+				}
+				for (int i = 0; i < 3; i++) //apple
+				{
+					sh[i].move(0, 8);
+				}
+				ss.move(0, 8); //sheild
 			}
-			for (int i = 0; i < 5; i++)  //nuke
-			{
-				b2[i].move(0, 8);
-			}
-			for (int i = 0; i < 3; i++) //apple
-			{
-				sh[i].move(0, 8);
-			}
-			ss.move(0, 8); //sheild
-			tb.move(0, 8); //tank booster
-			bb.move(0, 8); //bullet booster
 
 			// #############################  collision  ########################
 			//tank and window
+			if (s1.getPosition().x <= 0 && Keyboard::isKeyPressed(Keyboard::Left)) {
+				s1.move(7, 0);
+			}
+			if (s1.getPosition().x >= 1184.8 && Keyboard::isKeyPressed(Keyboard::Right) && bound == 1) {
+				s1.move(-7, 0);
+			}
 
 			//bombs with the tank
 			for (int i = 0; i < 10; i++) {
@@ -408,20 +457,7 @@ int main()
 					b = 250;
 				shon = 1;
 			}
-			//tank booster with tank
-			if (s1.getGlobalBounds().intersects(tb.getGlobalBounds())) {
-				tb.setPosition(rand() % 1200, -6480);
-				tc = 2;
-				tbb = 1;
-				tbc.restart();
-			}
-			//bullet booster with tank
-			if (s1.getGlobalBounds().intersects(bb.getGlobalBounds())) {
-				bb.setPosition(rand() % 1200, -6480);
-				bc = 2;
-				bbb = 1;
-				bbc.restart();
-			}
+
 			//bullet with nukes
 			for (int i = 0; i < 5; i++) {
 				if (s2.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
@@ -461,6 +497,34 @@ int main()
 				s2.setPosition(1800, 800);
 				explosion.play();
 			}
+
+		}
+		//.................survival..mode.......
+		if (nav == 2) {
+			//....repeat movement
+			if (tb.getPosition().y > 720)//tank booster
+				tb.setPosition(rand() % 1200, -7200);
+
+			if (bb.getPosition().y > 720)//bullet booster
+				bb.setPosition(rand() % 1200, -6480);
+			//....move
+			tb.move(0, 8); //tank booster
+			bb.move(0, 8); //bullet booster
+						// #############################  collision  ########################
+			//tank booster with tank
+			if (s1.getGlobalBounds().intersects(tb.getGlobalBounds())) {
+				tb.setPosition(rand() % 1200, -6480);
+				tc = 2;
+				tbb = 1;
+				tbc.restart();
+			}
+			//bullet booster with tank
+			if (s1.getGlobalBounds().intersects(bb.getGlobalBounds())) {
+				bb.setPosition(rand() % 1200, -6480);
+				bc = 2;
+				bbb = 1;
+				bbc.restart();
+			}
 			//bullets with tank booster
 			if (s2.getGlobalBounds().intersects(tb.getGlobalBounds())) {
 				tb.setPosition(rand() % 1200, -6480);
@@ -490,6 +554,7 @@ int main()
 			}
 		}
 
+		//.................game..ending.....
 		if (nav == 3)
 		{
 			music.stop();
@@ -499,9 +564,26 @@ int main()
 		}
 
 
+		if (h <= 0)
+			nav = 3;
+
+		if (shi <= 0)
+			shon = 0;
+
+		// ################ pause menu and go back ###########
+		if (Keyboard::isKeyPressed(Keyboard::Escape))
+		{
+			if (nav == 1)nav = 0;// go from campaign menu to main menu
+			if (nav == 2 || nav == 11 || nav == 12 || nav == 13) bool pause = 1; //pause the game
+		}
+		if (pause)
+			RenderWindow pause(VideoMode(640, 360), "Pause Menu");
+
+
 		//#################### draw ###################
 		window.clear();
-		if (nav == 0) //main menu
+		//main menu
+		if (nav == 0)
 		{
 			window.draw(ibg);
 			for (int i = 0; i < 3; i++)
@@ -511,7 +593,8 @@ int main()
 			}
 
 		}
-		if (nav == 1) // campaign menu
+		// campaign menu
+		if (nav == 1)
 		{
 			window.draw(ibg);
 			for (int i = 3; i < 6; i++)
@@ -522,7 +605,7 @@ int main()
 		}
 
 		//####### game  #######
-		if (nav == 2)
+		if (nav == 2 || nav == 11 || nav == 12 || nav == 13)
 		{
 			window.draw(gbg);
 			window.draw(s1);
@@ -542,21 +625,23 @@ int main()
 			window.draw(ss);//sheild
 			window.draw(r1);// sheild bar
 			window.draw(r2);// health bar
-							// text for score health sheild
+			// text for score health sheild
 			window.draw(score);	window.draw(health);
 			if (shon)
 				window.draw(sheild);
-			//boosters & boosters' icons
-			window.draw(tb); 	window.draw(bb);
-			if (tbb)
-				window.draw(tbi);
-			if (bbb)
-				window.draw(bbi);
+		}
+		if (nav == 2)
+		{	//boosters & boosters' icons
+		window.draw(tb); 	window.draw(bb);
+		if (tbb)
+			window.draw(tbi);
+		if (bbb)
+			window.draw(bbi);
 		}
 		//#######  ending  #######
 		if (nav == 3)
 		{
-			if (s == 300) {
+			if (s >= 300) {
 				window.draw(endgame[0]);
 			}
 			if (h <= 0) {
