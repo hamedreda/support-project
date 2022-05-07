@@ -187,7 +187,7 @@ int main()
 	Music music;
 	music.openFromFile("Game audio1.wav");
 	music.setLoop("Game audio1.wav");
-	music.play();
+	//music.play();
 
 
 	while (window.isOpen())
@@ -641,11 +641,11 @@ int main()
 		//#######  ending  #######
 		if (nav == 3)
 		{
-			if (s >= 300) {
-				window.draw(endgame[0]);
-			}
 			if (h <= 0) {
 				window.draw(endgame[1]);
+			}
+			else if (s >= 300) {
+				window.draw(endgame[0]);
 			}
 		}
 		window.display();
