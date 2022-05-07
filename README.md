@@ -187,7 +187,7 @@ int main()
 	Music music;
 	music.openFromFile("Game audio1.wav");
 	music.setLoop("Game audio1.wav");
-	//music.play();
+	music.play();
 
 
 	while (window.isOpen())
