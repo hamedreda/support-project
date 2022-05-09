@@ -36,6 +36,7 @@ int main()
 	int tc = 1, bc = 1; //speed const.(boosters)
 	Clock tbc, bbc; // clock for boosters
 	bool fired = 0, shon = 0, tbb = 0, bbb = 0; //bools for bullet,sheild,boosters
+	Clock survt; int reqtime = 25, speed = 0; //survival time&speed
 
 
 	Font f; f.loadFromFile("font.ttf"); //FONT
@@ -237,7 +238,10 @@ int main()
 			if (Mouse::isButtonPressed(Mouse::Left))
 			{
 				if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80)   nav = 1; // to campaign "click on campaign"
-				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>125 && mousepos.y < 164)  nav = 2; // to survival "click on survival"
+				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>125 && mousepos.y < 164) {
+					nav = 2; 
+					survt.restart();
+				}// to survival "click on survival"
 				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>227 && mousepos.y < 268) window.close(); //exit from main menu "click on exit"
 			}
 		}
@@ -369,11 +373,11 @@ int main()
 				//move
 				for (int i = 0; i < 10; i++) // bomb1
 				{
-					b1[i].move(0, 8);
+					b1[i].move(0, 8 + speed);
 				}
 				for (int i = 0; i < 5; i++)  //nuke
 				{
-					b2[i].move(0, 8);
+					b2[i].move(0, 8 + speed);
 				}
 				for (int i = 0; i < 3; i++) //apple
 				{
@@ -552,6 +556,10 @@ int main()
 					bc = 1;
 					bbb = 0;
 				}
+			}
+			if (survt.getElapsedTime().asSeconds() > reqtime) {
+				speed += 2;
+				reqtime += 25;
 			}
 		}
 
