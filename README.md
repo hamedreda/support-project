@@ -112,11 +112,13 @@ int main()
 	gbg.setTexture(tg);
 	Font ending;
 	ending.loadFromFile("endgame.ttf");
-	Text strtgame;	Text endgame[2];
-	for (int i = 0; i < 2; i++) {
+	Font moving;
+	moving.loadFromFile("chunk.otf");
+	Text strtgame;	Text endgame[4];  Text movegame;
+	for (int i = 0; i < 4; i++) {
 		endgame[i].setFont(ending);
 		endgame[i].setCharacterSize(65);
-		endgame[i].setPosition(300, 300);
+		endgame[i].setPosition(300, 200);
 		endgame[i].setFillColor(sf::Color::Red);
 	}
 	strtgame.setFont(ending);
@@ -125,6 +127,14 @@ int main()
 	strtgame.setString("press ENTER when you are ready to play");
 	endgame[0].setString("Well done soldier");
 	endgame[1].setString("Mission failed succesfully");
+	endgame[2].setPosition(300, 300);
+	endgame[3].setPosition(300, 400);
+	movegame.setFont(moving);
+	movegame.setCharacterSize(57);
+	movegame.setPosition(85, -10);
+	movegame.setFillColor(sf::Color::Red);
+	movegame.setString("Move to the right & Press enter");
+
 
 
 	// 5-  the cover that holds the text inside it 
@@ -313,7 +323,7 @@ int main()
 		if (nav == 13) {
 			reqscore = 300;
 			if (s >= reqscore) {
-				nav = 3;
+				nav = 31;
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280) {
 				bound = 1;
@@ -573,8 +583,13 @@ int main()
 		}
 
 
-		if (h <= 0)
-			nav = 3;
+		if (h <= 0) {
+			if (nav == 2)
+				nav = 32;
+			if (nav == 11 | nav == 12 | nav == 13)
+				nav = 31;
+		}
+			
 
 		if (shi <= 0)
 			shon = 0;
@@ -651,15 +666,27 @@ int main()
 			window.draw(bbi);
 		}
 		//#######  ending  #######
-		if (nav == 3)
+		endgame[2].setString("Score: " + to_string(s));
+		endgame[3].setString("Time: delete this & put time");
+		if (nav == 31)
 		{
+			if (s >= 300)
+				window.draw(endgame[0]);
 			if (h <= 0) {
 				window.draw(endgame[1]);
-			}
-			else if (s >= 300) {
-				window.draw(endgame[0]);
+				window.draw(endgame[2]);
 			}
 		}
+		if (nav == 32) {
+			window.draw(endgame[2]);
+			window.draw(endgame[3]);
+		}
+		if (s >= reqscore) {
+			if (nav == 11 || nav == 12 || nav == 13) {
+				window.draw(movegame);
+			}
+		}
+
 		window.display();
 	}
 	return 0;
