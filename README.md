@@ -49,7 +49,7 @@ for (int i = 0; i < 10; i++) {
 		//explosion animation
 		for (int i = 0; i < 5; i++) {
 			
-			if (exp2[i].getPosition().x <= 1280 && exp2[i].getPosition().x >= 0) {
+			if (exp2[i].getPosition().x <= 1280 && exp2[i].getPosition().x >= -200) {
 				if (collided2[i]) {
 					if (animation2[i].getElapsedTime().asSeconds() > 0.1) {
 						cnt1x[i]++;
@@ -74,7 +74,7 @@ for (int i = 0; i < 10; i++) {
 		}
 		for (int i = 0; i < 10; i++) {
 
-			if (exp1[i].getPosition().x <= 1280 && exp1[i].getPosition().x >= 0) {
+			if (exp1[i].getPosition().x <= 1280 && exp1[i].getPosition().x >= -200) {
 				if (collided1[i]) {
 					if (animation1[i].getElapsedTime().asSeconds() > 0.1) {
 						cnt2x[i]++;
