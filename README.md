@@ -36,6 +36,7 @@ int main()
 	int tc = 1, bc = 1; //speed const.(boosters)
 	Clock tbc, bbc; // clock for boosters
 	bool fired = 0, shon = 0, tbb = 0, bbb = 0; //bools for bullet,sheild,boosters
+	Clock survt; int reqtime = 25, speed = 0; //survival time&speed
 
 
 	Font f; f.loadFromFile("font.ttf"); //FONT
@@ -111,11 +112,13 @@ int main()
 	gbg.setTexture(tg);
 	Font ending;
 	ending.loadFromFile("endgame.ttf");
-	Text strtgame;	Text endgame[2];
-	for (int i = 0; i < 2; i++) {
+	Font moving;
+	moving.loadFromFile("chunk.otf");
+	Text strtgame;	Text endgame[4];  Text movegame;
+	for (int i = 0; i < 4; i++) {
 		endgame[i].setFont(ending);
 		endgame[i].setCharacterSize(65);
-		endgame[i].setPosition(300, 300);
+		endgame[i].setPosition(300, 200);
 		endgame[i].setFillColor(sf::Color::Red);
 	}
 	strtgame.setFont(ending);
@@ -124,6 +127,16 @@ int main()
 	strtgame.setString("press ENTER when you are ready to play");
 	endgame[0].setString("Well done soldier");
 	endgame[1].setString("Mission failed succesfully");
+	endgame[2].setPosition(300, 300);
+	endgame[2].setString("Score: " + to_string(s));
+	endgame[3].setPosition(300, 400);
+	endgame[3].setString("Time: delete this & put time");
+	movegame.setFont(moving);
+	movegame.setCharacterSize(57);
+	movegame.setPosition(85, -10);
+	movegame.setFillColor(sf::Color::Red);
+	movegame.setString("Move to the right & Press enter");
+
 
 
 	// 5-  the cover that holds the text inside it 
@@ -187,7 +200,7 @@ int main()
 	Music music;
 	music.openFromFile("Game audio1.wav");
 	music.setLoop("Game audio1.wav");
-	music.play();
+	//music.play();
 
 
 	while (window.isOpen())
@@ -237,7 +250,10 @@ int main()
 			if (Mouse::isButtonPressed(Mouse::Left))
 			{
 				if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80)   nav = 1; // to campaign "click on campaign"
-				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>125 && mousepos.y < 164)  nav = 2; // to survival "click on survival"
+				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>125 && mousepos.y < 164) {
+					nav = 2; 
+					survt.restart();
+				}// to survival "click on survival"
 				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>227 && mousepos.y < 268) window.close(); //exit from main menu "click on exit"
 			}
 		}
@@ -369,11 +385,11 @@ int main()
 				//move
 				for (int i = 0; i < 10; i++) // bomb1
 				{
-					b1[i].move(0, 8);
+					b1[i].move(0, 8 + speed);
 				}
 				for (int i = 0; i < 5; i++)  //nuke
 				{
-					b2[i].move(0, 8);
+					b2[i].move(0, 8 + speed);
 				}
 				for (int i = 0; i < 3; i++) //apple
 				{
@@ -385,10 +401,10 @@ int main()
 			// #############################  collision  ########################
 			//tank and window
 			if (s1.getPosition().x <= 0 && Keyboard::isKeyPressed(Keyboard::Left)) {
-				s1.move(7, 0);
+				s1.move(tc * 7, 0);
 			}
 			if (s1.getPosition().x >= 1184.8 && Keyboard::isKeyPressed(Keyboard::Right) && bound == 1) {
-				s1.move(-7, 0);
+				s1.move(tc * -7, 0);
 			}
 
 			//bombs with the tank
@@ -415,6 +431,7 @@ int main()
 					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					if (shon && shi < 30) {
 						h -= 30 - shi;
+						a -= 75 - b;
 						health.setString(to_string(h));
 						shi = 0;
 						sheild.setString(to_string(shi));
@@ -552,6 +569,10 @@ int main()
 					bbb = 0;
 				}
 			}
+			if (survt.getElapsedTime().asSeconds() > reqtime) {
+				speed += 2;
+				reqtime += 25;
+			}
 		}
 
 		//.................game..ending.....
@@ -610,25 +631,28 @@ int main()
 			window.draw(gbg);
 			window.draw(s1);
 			window.draw(s2);
-			for (int i = 0; i < 10; i++) //bomb 1
-			{
-				window.draw(b1[i]);
+
+			if (bound) {
+				for (int i = 0; i < 10; i++) //bomb 1
+				{
+					window.draw(b1[i]);
+				}
+				for (int i = 0; i < 5; i++) //bomb 2
+				{
+					window.draw(b2[i]);
+				}
+				for (int i = 0; i < 3; i++) //apple
+				{
+					window.draw(sh[i]);
+				}
+				window.draw(ss);//sheild
+				window.draw(r1);// sheild bar
+				window.draw(r2);// health bar
+				// text for score health sheild
+				window.draw(score);	window.draw(health);
+				if (shon)
+					window.draw(sheild);
 			}
-			for (int i = 0; i < 5; i++) //bomb 2
-			{
-				window.draw(b2[i]);
-			}
-			for (int i = 0; i < 3; i++) //apple
-			{
-				window.draw(sh[i]);
-			}
-			window.draw(ss);//sheild
-			window.draw(r1);// sheild bar
-			window.draw(r2);// health bar
-			// text for score health sheild
-			window.draw(score);	window.draw(health);
-			if (shon)
-				window.draw(sheild);
 		}
 		if (nav == 2)
 		{	//boosters & boosters' icons
@@ -641,13 +665,21 @@ int main()
 		//#######  ending  #######
 		if (nav == 3)
 		{
-			if (h <= 0) {
-				window.draw(endgame[1]);
-			}
-			else if (s >= 300) {
+			if (s >= 300) {
 				window.draw(endgame[0]);
 			}
+			if (h <= 0) {
+				window.draw(endgame[1]);
+				window.draw(endgame[2]);
+				window.draw(endgame[3]);
+			}
 		}
+		if (s >= reqscore) {
+			if (nav == 11 || nav == 12 || nav == 13) {
+				window.draw(movegame);
+			}
+		}
+
 		window.display();
 	}
 	return 0;
