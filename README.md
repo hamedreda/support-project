@@ -38,6 +38,26 @@ int main()
 	bool fired = 0, shon = 0, tbb = 0, bbb = 0; //bools for bullet,sheild,boosters
 	Clock survt; int reqtime = 25, speed = 0; //survival time&speed
 
+	//sian..start..
+	Clock animation1[10],animation2[5];
+	int cnt1x[5], cnt1y[5]; int cnt2x[10], cnt2y[10];
+	bool collided1[10] = { 0 }, collided2[5] = { 0 };
+	Texture exp;
+	exp.loadFromFile("explosion.png");
+	Sprite exp1[10], exp2[5];
+	for (int i = 0; i < 10; i++) {
+		exp1[i].setTexture(exp);
+		exp1[i].setTextureRect(IntRect(0, 0, 145, 150));
+		exp1[i].setPosition(2000, 2000);
+		exp1[i].setScale(1, 1);
+	}
+	for (int i = 0; i < 5; i++) {
+		exp2[i].setTexture(exp);
+		exp2[i].setTextureRect(IntRect(0, 0, 145, 150));
+		exp2[i].setPosition(2000, 2000);
+		exp2[i].setScale(1.5, 1.5);
+	}
+	//sian..end..
 
 	Font f; f.loadFromFile("font.ttf"); //FONT
 						// TEXT FOR SCORE & HEALTH & SHEILD :
@@ -128,9 +148,7 @@ int main()
 	endgame[0].setString("Well done soldier");
 	endgame[1].setString("Mission failed succesfully");
 	endgame[2].setPosition(300, 300);
-	endgame[2].setString("Score: " + to_string(s));
 	endgame[3].setPosition(300, 400);
-	endgame[3].setString("Time: delete this & put time");
 	movegame.setFont(moving);
 	movegame.setCharacterSize(57);
 	movegame.setPosition(85, -10);
@@ -325,7 +343,7 @@ int main()
 		if (nav == 13) {
 			reqscore = 300;
 			if (s >= reqscore) {
-				nav = 3;
+				nav = 31;
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280) {
 				bound = 1;
@@ -478,17 +496,23 @@ int main()
 			//bullet with nukes
 			for (int i = 0; i < 5; i++) {
 				if (s2.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
+					animation2[i].restart();
+					exp2[i].setPosition(b2[i].getPosition().x - 100, b2[i].getPosition().y - 65);
 					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					s += 10;
 					score.setString(to_string(s));
 					fired = 0;
 					s2.setPosition(800, 800);
+					collided2[i] = 1;
 					explosion.play();
 				}
 			}
 			//bullets with bombs
 			for (int i = 0; i < 10; i++) {
 				if (s2.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
+					collided1[i] = 1;
+					animation1[i].restart();
+					exp1[i].setPosition(b1[i].getPosition().x - 50, b1[i].getPosition().y - 30);
 					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					s += 10;
 					score.setString(to_string(s));
@@ -497,6 +521,7 @@ int main()
 					explosion.play();
 				}
 			}
+
 			//bullets with apple
 			for (int i = 0; i < 3; i++)
 			{
@@ -514,6 +539,58 @@ int main()
 				s2.setPosition(1800, 800);
 				explosion.play();
 			}
+			//#################### explosion animation #########################
+			for (int i = 0; i < 5; i++) {
+
+				if (exp2[i].getPosition().x <= 1280 && exp2[i].getPosition().x >= -200) {
+					if (collided2[i]) {
+						if (animation2[i].getElapsedTime().asSeconds() > 0.1) {
+							cnt1x[i]++;
+							animation2[i].restart();
+							if (cnt1x[i] % 3 == 2) {
+								cnt1y[i] += 1;
+							}
+						}
+					}
+
+					cnt1x[i] %= 3;
+					cnt1y[i] %= 3;
+				}
+				exp2[i].setTextureRect(IntRect(cnt1x[i] * 145, cnt1y[i] * 150, 145, 150));
+				if (cnt1x[i] == cnt1y[i] && cnt1y[i] == 2) {
+					exp2[i].setPosition(2000, 200);
+					collided2[i] = 0;
+					cnt1x[i] = 0;
+					cnt1y[i] = 0;
+				}
+
+			}
+			for (int i = 0; i < 10; i++) {
+
+				if (exp1[i].getPosition().x <= 1280 && exp1[i].getPosition().x >= -200) {
+					if (collided1[i]) {
+						if (animation1[i].getElapsedTime().asSeconds() > 0.1) {
+							cnt2x[i]++;
+							animation1[i].restart();
+							if (cnt2x[i] % 3 == 2) {
+								cnt2y[i] += 1;
+							}
+						}
+					}
+
+					cnt2x[i] %= 3;
+					cnt2y[i] %= 3;
+				}
+				exp1[i].setTextureRect(IntRect(cnt2x[i] * 145, cnt2y[i] * 150, 145, 150));
+				if (cnt2x[i] == cnt2y[i] && cnt2y[i] == 2) {
+					exp1[i].setPosition(2000, 200);
+					collided1[i] = 0;
+					cnt2x[i] = 0;
+					cnt2y[i] = 0;
+				}
+
+			}
+
 
 		}
 		//.................survival..mode.......
@@ -585,8 +662,13 @@ int main()
 		}
 
 
-		if (h <= 0)
-			nav = 3;
+		if (h <= 0) {
+			if (nav == 2)
+				nav = 32;
+			if (nav == 11 | nav == 12 | nav == 13)
+				nav = 31;
+		}
+			
 
 		if (shi <= 0)
 			shon = 0;
@@ -652,6 +734,15 @@ int main()
 				window.draw(score);	window.draw(health);
 				if (shon)
 					window.draw(sheild);
+				
+				//nuke explosion
+				for (int i = 0; i < 5; i++) {
+					window.draw(exp2[i]);
+				}
+				//bomb explosion
+				for (int i = 0; i < 10; i++) {
+					window.draw(exp1[i]);
+				}
 			}
 		}
 		if (nav == 2)
@@ -663,16 +754,20 @@ int main()
 			window.draw(bbi);
 		}
 		//#######  ending  #######
-		if (nav == 3)
+		endgame[2].setString("Score: " + to_string(s));
+		endgame[3].setString("Time: delete this & put time");
+		if (nav == 31)
 		{
-			if (s >= 300) {
+			if (s >= 300)
 				window.draw(endgame[0]);
-			}
 			if (h <= 0) {
 				window.draw(endgame[1]);
 				window.draw(endgame[2]);
-				window.draw(endgame[3]);
 			}
+		}
+		if (nav == 32) {
+			window.draw(endgame[2]);
+			window.draw(endgame[3]);
 		}
 		if (s >= reqscore) {
 			if (nav == 11 || nav == 12 || nav == 13) {
