@@ -254,7 +254,7 @@ int main()
 	htp21[0].setCharacterSize(100);		htp21[0].setFillColor(Color::Blue);
 	htp21[0].setString("Movement");		htp21[1].setString("left & right arrows to move");		htp21[2].setString("spacebar to shoot");
 	htp21[0].setPosition(400, 5);		htp21[1].setPosition(240, 200);							htp21[2].setPosition(240, 320);
-	htp21[3].setString("TIP : always move or you will get hurt");			htp21[3].setPosition(200, 590);
+	htp21[3].setString("TIP :think well before shooting :) ");			htp21[3].setPosition(200, 590);
 
 	Text htp22[5];
 	for (int i = 0; i < 5; i++)
@@ -396,7 +396,7 @@ int main()
 				}// to survival "click on survival"
 				if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424) nav = 3; // from main menu to credits
 				if (mousepos.x > 43 && mousepos.x < 274 && mousepos.y>265 && mousepos.y < 315) nav = 21; // from main menu to how to play "movement"
-				if (mousepos.x > 43 && mousepos.x < 258 && mousepos.y>625 && mousepos.y < 665 ) nav = 4; // highscores
+				if (mousepos.x > 43 && mousepos.x < 258 && mousepos.y>625 && mousepos.y < 665) nav = 4; // highscores
 				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>505 && mousepos.y < 545) window.close(); //exit from main menu "click on exit"
 			}
 		}
@@ -460,7 +460,7 @@ int main()
 				bound = 0;
 				setter();
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280) 
+			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
 			{
 				bound = 1;
 				s1.setPosition(20, 600);
@@ -476,7 +476,7 @@ int main()
 				bound = 0;
 				setter();
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280) 
+			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
 			{
 				bound = 1;
 				s1.setPosition(20, 600);
@@ -816,7 +816,7 @@ int main()
 		{	//new added numbers
 			if (nav == 1 || nav == 3 || nav == 4 || nav == 21 || nav == 22 || nav == 23)nav = 0;// go from campaign menu to main menu // new added credits and how to play and highscores
 			if (nav == 2 || nav == 11 || nav == 12 || nav == 13)  pause = 1; //pause the game
-			if (nav == 32|| nav==31) { h = 100; nav = 0; survt.restart(); } // after survival go back to main menu
+			if (nav == 32 || nav == 31) { h = 100; nav = 0; survt.restart(); } // after survival go back to main menu
 
 		}
 		// new pause menu loop
@@ -864,9 +864,7 @@ int main()
 					{
 						pause = 0;
 						pausewindow.close();
-						nav = 0;
-						//???????????????newest
-						{	s = 0;	h = 100; }
+						main();
 					}
 
 				}
