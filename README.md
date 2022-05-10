@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp>;
+#include "SFML/Graphics.hpp";
 #include <SFML/Audio.hpp>;
 using namespace sf;
 using namespace std;
@@ -653,7 +653,7 @@ int main()
 		}
 
 		//.................game..ending.....
-		if (nav == 3)
+		if (nav == 31 | nav ==32)
 		{
 			music.stop();
 			if (Keyboard::isKeyPressed(Keyboard::Enter)) {
