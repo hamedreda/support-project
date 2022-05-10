@@ -37,6 +37,7 @@ int main()
 	Clock tbc, bbc; // clock for boosters
 	bool fired = 0, shon = 0, tbb = 0, bbb = 0; //bools for bullet,sheild,boosters
 	Clock survt; int reqtime = 25, speed = 0; //survival time&speed
+	int survcnt = 0;
 
 	//sian..start..
 	Clock animation1[10], animation2[5];
@@ -798,6 +799,7 @@ int main()
 				speed += 2;
 				reqtime += 25;
 			}
+			survcnt = survt.getElapsedTime().asSeconds();
 		}
 
 		if (h <= 0) {
@@ -805,7 +807,7 @@ int main()
 				nav = 32;
 			if (nav == 11 | nav == 12 | nav == 13)
 				nav = 31;
-		}
+		} 
 
 
 		if (shi <= 0)
@@ -816,7 +818,7 @@ int main()
 		{	//new added numbers
 			if (nav == 1 || nav == 3 || nav == 4 || nav == 21 || nav == 22 || nav == 23)nav = 0;// go from campaign menu to main menu // new added credits and how to play and highscores
 			if (nav == 2 || nav == 11 || nav == 12 || nav == 13)  pause = 1; //pause the game
-			if (nav == 32 || nav == 31) { h = 100; nav = 0; survt.restart(); } // after survival go back to main menu
+			if (nav == 32 || nav == 31) main(); // play again
 
 		}
 		// new pause menu loop
@@ -991,7 +993,7 @@ int main()
 		}
 		//#######  ending  #######
 		endgame[2].setString("Score: " + to_string(s));
-		endgame[3].setString("Time: delete this & put time");
+		endgame[3].setString("Time: "+ to_string(survcnt/60)+":"+ to_string(survcnt % 60));
 		if (nav == 31)
 		{
 			if (s >= 300)
