@@ -128,9 +128,11 @@ int main()
 	// 4- game's starting & ending txt + intro & game bg 
 	Texture ti, tg;
 	ti.loadFromFile("intro.jpg"); tg.loadFromFile("game.jpg");
+	Texture lvl1, lvl2, lvl3;
+	lvl1.loadFromFile("lvl1.jpeg"); lvl2.loadFromFile("lvl2.jpeg"); lvl3.loadFromFile("lvl3.jpeg");
 	Sprite ibg, gbg;
 	ibg.setTexture(ti);
-	gbg.setTexture(tg);
+
 	Font ending;
 	ending.loadFromFile("endgame.ttf");
 	Font moving;
@@ -456,6 +458,7 @@ int main()
 
 		if (nav == 11)
 		{
+			gbg.setTexture(lvl1);
 			if (s >= reqscore)
 			{
 				bound = 0;
@@ -471,6 +474,7 @@ int main()
 			}
 		}
 		if (nav == 12) {
+			gbg.setTexture(lvl2);
 			reqscore = 250;
 			if (s >= reqscore)
 			{
@@ -488,6 +492,7 @@ int main()
 		}
 		if (nav == 13)
 		{
+			gbg.setTexture(lvl3);
 			reqscore = 300;
 			if (s >= reqscore)
 			{
@@ -744,6 +749,7 @@ int main()
 		}
 		//.................survival..mode.......
 		if (nav == 2) {
+			gbg.setTexture(tg);
 			//....repeat movement
 			if (tb.getPosition().y > 720)//tank booster
 				tb.setPosition(rand() % 1200, -7200);
