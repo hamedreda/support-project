@@ -137,17 +137,13 @@ int main()
 	ending.loadFromFile("endgame.ttf");
 	Font moving;
 	moving.loadFromFile("chunk.otf");
-	Text strtgame;	Text endgame[4];  Text movegame;
+	Text endgame[4];  Text movegame;	Text backToMain;
 	for (int i = 0; i < 4; i++) {
 		endgame[i].setFont(ending);
 		endgame[i].setCharacterSize(65);
 		endgame[i].setPosition(300, 200);
 		endgame[i].setFillColor(sf::Color::Red);
 	}
-	strtgame.setFont(ending);
-	strtgame.setCharacterSize(50);
-	strtgame.setPosition(200, 300);
-	strtgame.setString("press ENTER when you are ready to play");
 	endgame[0].setString("Well done soldier");
 	endgame[1].setString("Mission failed succesfully");
 	endgame[2].setPosition(300, 300);
@@ -157,6 +153,11 @@ int main()
 	movegame.setPosition(85, -10);
 	movegame.setFillColor(sf::Color::Red);
 	movegame.setString("Move to the right & Press enter");
+	backToMain.setFont(ending);
+	backToMain.setCharacterSize(50);
+	backToMain.setFillColor(Color::Red);
+	backToMain.setString("press Esc to go back to Main Menu");
+	backToMain.setPosition(300, 500);
 
 
 
@@ -187,10 +188,10 @@ int main()
 	textCover[2].setPosition(0, 400);
 
 	//############ main menu text ############
-	Font font;		  Text mmt[9];		bool color = 0;
+	Font font;		  Text mmt[8];		bool color = 0;
 	font.loadFromFile("Top Secret Stamp.ttf");
 
-	for (int i = 3; i < 9; i++) // new added text and changed positions
+	for (int i = 3; i < 8; i++) // new added text and changed positions
 	{
 		mmt[i].setFont(font);
 		mmt[i].setCharacterSize(48);
@@ -199,8 +200,8 @@ int main()
 
 	mmt[3].setString("Campaign");			mmt[4].setString("Survival");		mmt[7].setString("Exit");
 	mmt[3].setPosition(47, 15);				mmt[4].setPosition(65, 135);		mmt[7].setPosition(100, 495);
-	mmt[5].setString("how to play");		mmt[6].setString("Credits");		mmt[8].setString("highscores");
-	mmt[5].setPosition(43, 255);			mmt[6].setPosition(80, 375);		mmt[8].setPosition(43, 615);
+	mmt[5].setString("how to play");		mmt[6].setString("Credits");		
+	mmt[5].setPosition(43, 255);			mmt[6].setPosition(80, 375);		
 
 	for (int i = 0; i < 3; i++) // text in campaign menu
 	{
@@ -227,17 +228,22 @@ int main()
 
 	//new 
 	// how to play 
-	Texture how_to_play[7];
+	Texture htpbg;	htpbg.loadFromFile("how to play back ground2 resized.jpg");
+	Sprite htpBG; htpBG.setTexture(htpbg);	htpBG.setScale(1, 1);	htpBG.setPosition(0, 0);
+
+
+	Texture how_to_play[9];
 	how_to_play[0].loadFromFile("white-arrow-left.png");	how_to_play[1].loadFromFile("white-arrow-right.png");
 	how_to_play[2].loadFromFile("spacebar.png");			how_to_play[3].loadFromFile("apple.png");
 	how_to_play[4].loadFromFile("shield.png");				how_to_play[5].loadFromFile("tbooster.png");
-	how_to_play[6].loadFromFile("bbooster.png");
+	how_to_play[6].loadFromFile("bbooster.png");			how_to_play[7].loadFromFile("bomb1.png");
+	how_to_play[8].loadFromFile("bomb2.png");
 
 	Sprite HowNav[2]; for (int i = 0; i < 2; i++) { HowNav[i].setTexture(how_to_play[i]); } // for navigation in how to play 
 	HowNav[0].setScale(0.2, 0.1);		HowNav[0].setPosition(500, 650);
 	HowNav[1].setScale(0.2, 0.1);		HowNav[1].setPosition(640, 650);
 
-	Sprite HowtoPlay[7]; for (int i = 0; i < 7; i++) { HowtoPlay[i].setTexture(how_to_play[i]); }
+	Sprite HowtoPlay[9]; for (int i = 0; i < 9; i++) { HowtoPlay[i].setTexture(how_to_play[i]); }
 	HowtoPlay[0].setScale(0.2, 0.2);		HowtoPlay[0].setPosition(5, 180);
 	HowtoPlay[1].setScale(0.2, 0.2);		HowtoPlay[1].setPosition(65, 180);
 	HowtoPlay[2].setScale(0.7, 0.2);		HowtoPlay[2].setPosition(5, 340);
@@ -245,6 +251,8 @@ int main()
 	HowtoPlay[4].setScale(0.04, 0.04);		HowtoPlay[4].setPosition(30, 220);
 	HowtoPlay[5].setScale(0.03, 0.03);		HowtoPlay[5].setPosition(25, 335);
 	HowtoPlay[6].setScale(0.06, 0.06);		HowtoPlay[6].setPosition(40, 460);
+	HowtoPlay[7].setScale(0.08, 0.08);		HowtoPlay[7].setPosition(40, 570);
+	HowtoPlay[8].setScale(0.12, 0.12);		HowtoPlay[8].setPosition(700, 575);
 
 
 	Text htp21[4];
@@ -272,18 +280,20 @@ int main()
 	htp22[3].setString("300 is the required score to pass End of the Line");			htp22[3].setPosition(5, 269);
 	htp22[4].setString("challenge yourself in survival mode and set your highscore");	htp22[4].setPosition(5, 369);
 
-	Text htp23[5];
-	for (int i = 0; i < 5; i++)
+	Text htp23[7];
+	for (int i = 0; i < 7; i++)
 	{
 		htp23[i].setFont(font);
 		htp23[i].setCharacterSize(50);
 		htp23[i].setStyle(Text::Bold);
 	}
 	htp23[0].setString("Pickups");		htp23[0].setCharacterSize(80);		htp23[0].setPosition(520, 0);	htp23[0].setFillColor(Color::Blue);
-	htp23[1].setString("apple : regenerates health");						htp23[1].setPosition(169, 100);
-	htp23[2].setString("armor : puts shield on tank");						htp23[2].setPosition(169, 220);
-	htp23[3].setString("accelrator : increase tank velocity");				htp23[3].setPosition(169, 340);
-	htp23[4].setString("thunder : increase bullet velocity");				htp23[4].setPosition(169, 460);
+	htp23[1].setString("apple : regenerates health");						htp23[1].setPosition(150, 100);
+	htp23[2].setString("armor : puts shield on tank");						htp23[2].setPosition(150, 220);
+	htp23[3].setString("accelrator : increase tank velocity");				htp23[3].setPosition(150, 350);
+	htp23[4].setString("thunder : increase bullet velocity");				htp23[4].setPosition(150, 460);
+	htp23[5].setString("bomb : does 10 damage");							htp23[5].setPosition(150, 580);
+	htp23[6].setString("nuke : does 30 damage");							htp23[6].setPosition(789, 580);
 
 	//new
 	//pause menu text
@@ -379,15 +389,7 @@ int main()
 				if (!color)		mmt[7].setFillColor(Color::White);
 				if (color)		mmt[7].setFillColor(Color::Blue);
 			}
-			// change color of highscores text // new
-			{
-				if (mousepos.x > 43 && mousepos.x < 258 && mousepos.y>625 && mousepos.y < 665 && nav == 0)
-					color = 1;
-				else            color = 0;
 
-				if (!color)		mmt[8].setFillColor(Color::White);
-				if (color)		mmt[8].setFillColor(Color::Blue);
-			}
 
 			//################# Navigation from main menu ##################
 			if (Mouse::isButtonPressed(Mouse::Left))
@@ -399,7 +401,7 @@ int main()
 				}// to survival "click on survival"
 				if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424) nav = 3; // from main menu to credits
 				if (mousepos.x > 43 && mousepos.x < 274 && mousepos.y>265 && mousepos.y < 315) nav = 21; // from main menu to how to play "movement"
-				if (mousepos.x > 43 && mousepos.x < 258 && mousepos.y>625 && mousepos.y < 665) nav = 4; // highscores
+
 				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>505 && mousepos.y < 545) window.close(); //exit from main menu "click on exit"
 			}
 		}
@@ -602,7 +604,7 @@ int main()
 				if (s1.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
 					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					if (shon && shi < 30) {
-						h -= 30 - shi;
+						h -= 30 - shi;   //h=h-(30-shi)
 						a -= 75 - b;
 						health.setString(to_string(h));
 						shi = 0;
@@ -698,7 +700,7 @@ int main()
 
 				if (exp2[i].getPosition().x <= 1280 && exp2[i].getPosition().x >= -200) {
 					if (collided2[i]) {
-						if (animation2[i].getElapsedTime().asSeconds() > 0.1) {
+						if (animation2[i].getElapsedTime().asSeconds() > 0.05) {
 							cnt1x[i]++;
 							animation2[i].restart();
 							if (cnt1x[i] % 3 == 2) {
@@ -723,7 +725,7 @@ int main()
 
 				if (exp1[i].getPosition().x <= 1280 && exp1[i].getPosition().x >= -200) {
 					if (collided1[i]) {
-						if (animation1[i].getElapsedTime().asSeconds() > 0.1) {
+						if (animation1[i].getElapsedTime().asSeconds() > 0.05) {
 							cnt2x[i]++;
 							animation1[i].restart();
 							if (cnt2x[i] % 3 == 2) {
@@ -892,7 +894,7 @@ int main()
 		if (nav == 0) // main menu
 		{
 			window.draw(ibg);
-			for (int i = 3; i < 9; i++) // new changed numbers
+			for (int i = 3; i < 8; i++) // new changed numbers
 			{
 				window.draw(textCover[i]);
 				window.draw(mmt[i]);
@@ -916,37 +918,43 @@ int main()
 			}
 		}
 		//new how to play "movement"
-		if (nav == 21)
+		if (nav == 21 || nav == 22 || nav == 23)
 		{
-			window.draw(HowNav[1]);
-			for (int i = 0; i < 3; i++)
+			window.draw(htpBG);
+			if (nav == 21)
 			{
-				window.draw(HowtoPlay[i]);
-				window.draw(htp21[i]);
-			}
-			window.draw(htp21[3]);
-		}
-		if (nav == 22) // how to play " campaign and survival"
-		{
-			window.draw(HowNav[0]);	window.draw(HowNav[1]);
-			for (int i = 0; i < 5; i++)
-			{
-				window.draw(htp22[i]);
-			}
-		}
-		if (nav == 23)// how to play "pickups"
-		{
-			window.draw(HowNav[0]);
-			for (int i = 0; i < 5; i++)
-			{
-				window.draw(htp23[i]);
-			}
-			for (int i = 3; i < 7; i++)
-			{
-				window.draw(HowtoPlay[i]);
-			}
-		}
 
+				window.draw(HowNav[1]);
+				for (int i = 0; i < 3; i++)
+				{
+					window.draw(HowtoPlay[i]);
+					window.draw(htp21[i]);
+				}
+				window.draw(htp21[3]);
+			}
+			if (nav == 22) // how to play " campaign and survival"
+			{
+
+				window.draw(HowNav[0]);	window.draw(HowNav[1]);
+				for (int i = 0; i < 5; i++)
+				{
+					window.draw(htp22[i]);
+				}
+			}
+			if (nav == 23)// how to play "pickups"
+			{
+
+				window.draw(HowNav[0]);
+				for (int i = 0; i < 7; i++)
+				{
+					window.draw(htp23[i]);
+				}
+				for (int i = 3; i < 9; i++)
+				{
+					window.draw(HowtoPlay[i]);
+				}
+			}
+		}
 
 
 
@@ -1002,16 +1010,23 @@ int main()
 		endgame[3].setString("Time: " + to_string(survcnt / 60) + ":" + to_string(survcnt % 60));
 		if (nav == 31)
 		{
+
 			if (s >= 300)
+			{
 				window.draw(endgame[0]);
+				window.draw(backToMain);
+			}
 			if (h <= 0) {
 				window.draw(endgame[1]);
 				window.draw(endgame[2]);
+				window.draw(backToMain);
 			}
 		}
 		if (nav == 32) {
+
 			window.draw(endgame[2]);
 			window.draw(endgame[3]);
+			window.draw(backToMain);
 		}
 		if (s >= reqscore) {
 			if (nav == 11 || nav == 12 || nav == 13) {
