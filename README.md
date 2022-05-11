@@ -29,8 +29,8 @@ int main()
 
 	window.setFramerateLimit(40); //fps
 	int reqscore = 200;
-	bool bound = 1;	//for boundries 
-	int nav = 0; bool pause = 0;//  navigation and pause game 
+	bool bound = 1;	//for boundries
+	int nav = 0; bool pause = 0;//  navigation and pause game
 	int a = 250, b = 0; //for HEALTH,SHEILD BAR
 	int h = 100, shi = 0, s = 0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE  
 	int tc = 1, bc = 1; //speed const.(boosters)
@@ -74,14 +74,12 @@ int main()
 	Texture t;
 	t.loadFromFile("Tank.png");
 	Sprite s1(t);
-	s1.setTexture(t);
 	s1.setScale(0.2, 0.2);
 	s1.setPosition(20, 600);
 	//2-bullets
 	Texture t4;
 	t4.loadFromFile("bullet.png");
 	Sprite s2(t4);
-	s2.setTexture(t4);
 	s2.setScale(0.025, 0.025);
 	s2.setPosition(800, 720);
 
@@ -127,7 +125,7 @@ int main()
 
 	// 4- game's starting & ending txt + intro & game bg 
 	Texture ti, tg;
-	ti.loadFromFile("intro.jpg"); tg.loadFromFile("game.jpg");
+	ti.loadFromFile("intro.jpg"); tg.loadFromFile("game.jpeg");
 	Texture lvl1, lvl2, lvl3;
 	lvl1.loadFromFile("lvl1.jpeg"); lvl2.loadFromFile("lvl2.jpeg"); lvl3.loadFromFile("lvl3.jpeg");
 	Sprite ibg, gbg;
@@ -137,17 +135,13 @@ int main()
 	ending.loadFromFile("endgame.ttf");
 	Font moving;
 	moving.loadFromFile("chunk.otf");
-	Text strtgame;	Text endgame[4];  Text movegame;
+	Text endgame[4];  Text movegame;
 	for (int i = 0; i < 4; i++) {
 		endgame[i].setFont(ending);
 		endgame[i].setCharacterSize(65);
 		endgame[i].setPosition(300, 200);
 		endgame[i].setFillColor(sf::Color::Red);
 	}
-	strtgame.setFont(ending);
-	strtgame.setCharacterSize(50);
-	strtgame.setPosition(200, 300);
-	strtgame.setString("press ENTER when you are ready to play");
 	endgame[0].setString("Well done soldier");
 	endgame[1].setString("Mission failed succesfully");
 	endgame[2].setPosition(300, 300);
@@ -246,7 +240,7 @@ int main()
 	HowtoPlay[5].setScale(0.03, 0.03);		HowtoPlay[5].setPosition(25, 335);
 	HowtoPlay[6].setScale(0.06, 0.06);		HowtoPlay[6].setPosition(40, 460);
 
-
+	//movement
 	Text htp21[4];
 	for (int i = 0; i < 4; i++)
 	{
@@ -259,6 +253,7 @@ int main()
 	htp21[0].setPosition(400, 5);		htp21[1].setPosition(240, 200);							htp21[2].setPosition(240, 320);
 	htp21[3].setString("TIP :think well before shooting :) ");			htp21[3].setPosition(200, 590);
 
+	//Campaign & Survival
 	Text htp22[5];
 	for (int i = 0; i < 5; i++)
 	{
@@ -272,6 +267,7 @@ int main()
 	htp22[3].setString("300 is the required score to pass End of the Line");			htp22[3].setPosition(5, 269);
 	htp22[4].setString("challenge yourself in survival mode and set your highscore");	htp22[4].setPosition(5, 369);
 
+	//Pickups
 	Text htp23[5];
 	for (int i = 0; i < 5; i++)
 	{
@@ -317,7 +313,6 @@ int main()
 	music.setLoop("Game audio1.wav");
 	//music.play();
 
-
 	while (window.isOpen())
 	{
 		RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR
@@ -329,14 +324,14 @@ int main()
 			if (event.type == Event::Closed)
 				window.close();
 		}
-		Vector2i mousepos = Mouse::getPosition(window);//to get position of mouse relative to window "easier than {Mouse ms;}"
 
+		Vector2i mousepos = Mouse::getPosition(window);//to get position of mouse relative to window "easier than {Mouse ms;}"
 		//....................main..menu......
 		if (nav == 0)
 		{
 			// change color of campaign text
 			{
-				if (mousepos.x > 45 && mousepos.x < 255 && mousepos.y>25 && mousepos.y < 76 && nav == 0)
+				if (mousepos.x > 45 && mousepos.x < 255 && mousepos.y>25 && mousepos.y < 76 )
 					color = 1;
 				else 			color = 0;
 
@@ -345,7 +340,7 @@ int main()
 			}
 			// change color of survival text // new changed numbers
 			{
-				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>145 && mousepos.y < 184 && nav == 0)
+				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>145 && mousepos.y < 184 )
 					color = 1;
 				else 			color = 0;
 
@@ -354,7 +349,7 @@ int main()
 			}
 			// change color of how to play text //new
 			{
-				if (mousepos.x > 43 && mousepos.x < 274 && mousepos.y>265 && mousepos.y < 315 && nav == 0)
+				if (mousepos.x > 43 && mousepos.x < 274 && mousepos.y>265 && mousepos.y < 315 )
 					color = 1;
 				else 			color = 0;
 
@@ -363,7 +358,7 @@ int main()
 			}
 			// change color of credits text //new
 			{
-				if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424 && nav == 0)
+				if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424 )
 					color = 1;
 				else 			color = 0;
 
@@ -372,7 +367,7 @@ int main()
 			}
 			// change color of exit text // new vhanged numbers
 			{
-				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>505 && mousepos.y < 545 && nav == 0)
+				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>505 && mousepos.y < 545 )
 					color = 1;
 				else            color = 0;
 
@@ -381,7 +376,7 @@ int main()
 			}
 			// change color of highscores text // new
 			{
-				if (mousepos.x > 43 && mousepos.x < 258 && mousepos.y>625 && mousepos.y < 665 && nav == 0)
+				if (mousepos.x > 43 && mousepos.x < 258 && mousepos.y>625 && mousepos.y < 665 )
 					color = 1;
 				else            color = 0;
 
@@ -412,8 +407,8 @@ int main()
 					color = 1;
 				else 			color = 0;
 
-				if (!color)		mmt[3].setFillColor(Color::White);
-				if (color)		mmt[3].setFillColor(Color::Blue);
+				if (!color)		mmt[0].setFillColor(Color::White);
+				if (color)		mmt[0].setFillColor(Color::Blue);
 			}
 			// change color of ashes to ashes text
 			{
@@ -421,8 +416,8 @@ int main()
 					color = 1;
 				else 			color = 0;
 
-				if (!color)		mmt[4].setFillColor(Color::White);
-				if (color)		mmt[4].setFillColor(Color::Blue);
+				if (!color)		mmt[1].setFillColor(Color::White);
+				if (color)		mmt[1].setFillColor(Color::Blue);
 			}
 			// change color of end of the line text
 			{
@@ -430,8 +425,8 @@ int main()
 					color = 1;
 				else            color = 0;
 
-				if (!color)		mmt[5].setFillColor(Color::White);
-				if (color)		mmt[5].setFillColor(Color::Blue);
+				if (!color)		mmt[2].setFillColor(Color::White);
+				if (color)		mmt[2].setFillColor(Color::Blue);
 			}
 			//################# Navigation in campaign ##################
 			if (Mouse::isButtonPressed(Mouse::Left))
@@ -813,7 +808,7 @@ int main()
 				nav = 32;
 			if (nav == 11 | nav == 12 | nav == 13)
 				nav = 31;
-		} 
+		}
 
 
 		if (shi <= 0)
@@ -999,7 +994,7 @@ int main()
 		}
 		//#######  ending  #######
 		endgame[2].setString("Score: " + to_string(s));
-		endgame[3].setString("Time: "+ to_string(survcnt/60)+":"+ to_string(survcnt % 60));
+		endgame[3].setString("Time: " + to_string(survcnt / 60) + ":" + to_string(survcnt % 60));
 		if (nav == 31)
 		{
 			if (s >= 300)
