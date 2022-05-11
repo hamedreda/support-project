@@ -3,6 +3,7 @@
 using namespace sf;
 using namespace std;
 
+// tebo
 Sprite b1[10], b2[5], sh[3], ss;// spr arr FOR BOMBS& SHIELD,apple
 void setter() {
 	//bomb1
@@ -23,23 +24,33 @@ void setter() {
 	//SHIELD
 	ss.setPosition(rand() % 1200, -5040);
 }
+//#################################################
 RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
 int main()
 {
-
 	window.setFramerateLimit(40); //fps
-	int reqscore = 200;
-	bool bound = 1;	//for boundries
-	int nav = 0; bool pause = 0;//  navigation and pause game
+
+	//andrew
 	int a = 250, b = 0; //for HEALTH,SHEILD BAR
-	int h = 100, shi = 0, s = 0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE  
+	int h = 100, shi = 0, s = 0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE 
+	bool shon = 0; //bool for sheild
+	RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR
+	RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1005, 15); r2.setFillColor(Color::Red); //HEALTH BAR
+	//#################################################
+
+	int nav = 0; bool pause = 0;//bebo....navigation and pause game
+	
+	bool bound = 1;	//tebo..for boundries
+	//hamed
+	int reqscore = 200;
 	int tc = 1, bc = 1; //speed const.(boosters)
 	Clock tbc, bbc; // clock for boosters
-	bool fired = 0, shon = 0, tbb = 0, bbb = 0; //bools for bullet,sheild,boosters
+	bool fired = 0, tbb = 0, bbb = 0; //bools for bullet,boosters
 	Clock survt; int reqtime = 25, speed = 0; //survival time&speed
 	int survcnt = 0;
+	//#################################################
 
-	//sian..start..
+	//haitham
 	Clock animation1[10], animation2[5];
 	int cnt1x[5], cnt1y[5]; int cnt2x[10], cnt2y[10];
 	bool collided1[10] = { 0 }, collided2[5] = { 0 };
@@ -58,19 +69,22 @@ int main()
 		exp2[i].setPosition(2000, 2000);
 		exp2[i].setScale(1.5, 1.5);
 	}
-	//sian..end..
+	//#################################################
 
 	Font f; f.loadFromFile("font.ttf"); //FONT
-						// TEXT FOR SCORE & HEALTH & SHEILD :
+	
+	//andrew
+							// TEXT FOR SCORE & HEALTH & SHEILD :
 	Text score, health, sheild;
 	score.setFont(f);					health.setFont(f);					sheild.setFont(f);
 	score.setString(to_string(s));	    health.setString(to_string(h));		sheild.setString(to_string(shi));
 	score.setPosition(15, -5);		    health.setPosition(950, -10);		sheild.setPosition(950, 30);
 	score.setFillColor(Color::Yellow);  health.setFillColor(Color::Yellow);
 	score.setCharacterSize(50);		    health.setCharacterSize(50);		sheild.setCharacterSize(50);
+	//#################################################
 
-	//################################ Textures & Sprites ###################################
-		//1-tank
+	//hamed
+	//1-tank
 	Texture t;
 	t.loadFromFile("Tank.png");
 	Sprite s1(t);
@@ -82,16 +96,17 @@ int main()
 	Sprite s2(t4);
 	s2.setScale(0.025, 0.025);
 	s2.setPosition(800, 720);
+	//#################################################
 
+	//tebo
+	srand(time(0)); //for random positions 
+	
 	// 3- BOMBS & SHIELD, APPLE , BOOSTERS
 	Texture t1, t2, t3, t5, p1, p2;
 	t1.loadFromFile("bomb1.png"); 	t2.loadFromFile("bomb2.png"); 	t3.loadFromFile("shield.png"); t5.loadFromFile("apple.png");
 	p1.loadFromFile("tbooster.png");	p2.loadFromFile("bbooster.png");
-
-	srand(time(0)); //for random positions 
-
 	// ........................  BOMBS& SHIELD,apple  .................................
-	 //bomb1
+	//bomb1
 	for (int i = 0; i < 10; i++)
 	{
 		b1[i].setTexture(t1);
@@ -116,172 +131,174 @@ int main()
 	ss.setTexture(t3);
 	ss.setPosition(rand() % 1200, -5040);
 	ss.setScale(0.03, 0.03);
+	//#################################################
+	
+	//hamed
 	//boosters
 	Sprite tb(p1), bb(p2), tbi(p1), bbi(p2);//tank booster,bullet booster, icons
 	tb.setPosition(rand() % 1200, -7200); 	bb.setPosition(rand() % 1200, -6480);
 	tb.setScale(0.02, 0.02); bb.setScale(0.05, 0.05);
 	tbi.setPosition(800, 12); bbi.setPosition(750, 15);
 	tbi.setScale(0.01, 0.01);	bbi.setScale(0.025, 0.025);
+	//#################################################
 
-	// 4- game's starting & ending txt + intro & game bg 
-	Texture ti, tg;
-	ti.loadFromFile("intro.jpg"); tg.loadFromFile("game.jpeg");
-	Texture lvl1, lvl2, lvl3;
-	lvl1.loadFromFile("lvl1.jpeg"); lvl2.loadFromFile("lvl2.jpeg"); lvl3.loadFromFile("lvl3.jpeg");
-	Sprite ibg, gbg;
-	ibg.setTexture(ti);
+	//faisl
+	
+		// 4- game's starting & ending txt + intro & game bg 
+		Texture ti, tg;
+		ti.loadFromFile("intro.jpg"); tg.loadFromFile("game.jpeg");
+		Texture lvl1, lvl2, lvl3;
+		lvl1.loadFromFile("lvl1.jpeg"); lvl2.loadFromFile("lvl2.jpeg"); lvl3.loadFromFile("lvl3.jpeg");
+		Sprite ibg, gbg;
+		ibg.setTexture(ti);
+		Font ending;
+		ending.loadFromFile("endgame.ttf");
+		Font moving;
+		moving.loadFromFile("chunk.otf");
+		Text endgame[4];  Text movegame;
+		for (int i = 0; i < 4; i++) {
+			endgame[i].setFont(ending);
+			endgame[i].setCharacterSize(65);
+			endgame[i].setPosition(300, 200);
+			endgame[i].setFillColor(sf::Color::Red);
+		}
+		endgame[0].setString("Well done soldier");
+		endgame[1].setString("Mission failed succesfully");
+		endgame[2].setPosition(300, 300);
+		endgame[3].setPosition(300, 400);
+		movegame.setFont(moving);
+		movegame.setCharacterSize(57);
+		movegame.setPosition(85, -10);
+		movegame.setFillColor(sf::Color::Red);
+		movegame.setString("Move to the right & Press enter");
 
-	Font ending;
-	ending.loadFromFile("endgame.ttf");
-	Font moving;
-	moving.loadFromFile("chunk.otf");
-	Text endgame[4];  Text movegame;
-	for (int i = 0; i < 4; i++) {
-		endgame[i].setFont(ending);
-		endgame[i].setCharacterSize(65);
-		endgame[i].setPosition(300, 200);
-		endgame[i].setFillColor(sf::Color::Red);
-	}
-	endgame[0].setString("Well done soldier");
-	endgame[1].setString("Mission failed succesfully");
-	endgame[2].setPosition(300, 300);
-	endgame[3].setPosition(300, 400);
-	movegame.setFont(moving);
-	movegame.setCharacterSize(57);
-	movegame.setPosition(85, -10);
-	movegame.setFillColor(sf::Color::Red);
-	movegame.setString("Move to the right & Press enter");
+		// 5-  the cover that holds the text inside it 
+		Texture textcover;
+		textcover.loadFromFile("TextCover.png");
+		Sprite textCover[9];
+		//############# Main menu ###############
+		for (int i = 3; i < 9; i++)
+		{
+			textCover[i].setScale(1.3, 1);
+			textCover[i].setTexture(textcover);
+		}
+		textCover[3].setPosition(0, 0);
+		textCover[4].setPosition(0, 120);
+		textCover[5].setPosition(0, 240);
+		textCover[6].setPosition(0, 360);
+		textCover[7].setPosition(0, 480);
+		textCover[8].setPosition(0, 600);
+		//############# Campaign menu ############## 
+		for (int i = 0; i < 3; i++) //new changed numbers
+		{
+			textCover[i].setScale(2, 2);
+			textCover[i].setTexture(textcover);
+		}
+		textCover[0].setPosition(0, 0);
+		textCover[1].setPosition(0, 200);
+		textCover[2].setPosition(0, 400);
 
+		//############ main menu text ############
+		Font font;		  Text mmt[9];		bool color = 0;
+		font.loadFromFile("Top Secret Stamp.ttf");
 
+		for (int i = 3; i < 9; i++)
+		{
+			mmt[i].setFont(font);
+			mmt[i].setCharacterSize(48);
+			mmt[i].setStyle(Text::Bold);
+		}
 
-	// 5-  the cover that holds the text inside it 
-	Texture textcover;
-	textcover.loadFromFile("TextCover.png");
-	Sprite textCover[9]; //new added 3 more
-	//############# Main menu ###############
-	for (int i = 3; i < 9; i++) // new changed numbers and positions
-	{
-		textCover[i].setScale(1.3, 1);
-		textCover[i].setTexture(textcover);
-	}
-	textCover[3].setPosition(0, 0);
-	textCover[4].setPosition(0, 120);
-	textCover[5].setPosition(0, 240);
-	textCover[6].setPosition(0, 360);
-	textCover[7].setPosition(0, 480);
-	textCover[8].setPosition(0, 600);
-	//############# Campaign menu ############## 
-	for (int i = 0; i < 3; i++) //new changed numbers
-	{
-		textCover[i].setScale(2, 2);
-		textCover[i].setTexture(textcover);
-	}
-	textCover[0].setPosition(0, 0);
-	textCover[1].setPosition(0, 200);
-	textCover[2].setPosition(0, 400);
+		mmt[3].setString("Campaign");			mmt[4].setString("Survival");		mmt[7].setString("Exit");
+		mmt[3].setPosition(47, 15);				mmt[4].setPosition(65, 135);		mmt[7].setPosition(100, 495);
+		mmt[5].setString("how to play");		mmt[6].setString("Credits");		mmt[8].setString("highscores");
+		mmt[5].setPosition(43, 255);			mmt[6].setPosition(80, 375);		mmt[8].setPosition(43, 615);
+		// text in campaign menu
+		for (int i = 0; i < 3; i++)
+		{
+			mmt[i].setFont(font);
+			mmt[i].setCharacterSize(50);
+			mmt[i].setStyle(Text::Bold);
+		}
+		mmt[0].setString("Scorched Earth");			mmt[1].setString("Ashes To Ashes");		mmt[2].setString("End of the Line");
+		mmt[0].setPosition(67, 70);					mmt[1].setPosition(67, 270);			mmt[2].setPosition(67, 470);
 
-	//############ main menu text ############
-	Font font;		  Text mmt[9];		bool color = 0;
-	font.loadFromFile("Top Secret Stamp.ttf");
+		// credits
+		Text clowns[6];
+		for (int i = 0; i < 6; i++)
+		{
+			clowns[i].setFont(font);
+			clowns[i].setCharacterSize(100);
+			clowns[i].setStyle(Text::Bold);
+		}
+		clowns[0].setString("Hamed");				clowns[1].setString("Haitham");				clowns[2].setString("Andrew");
+		clowns[0].setPosition(5, 5);				clowns[1].setPosition(640, 5);				clowns[2].setPosition(5, 205);
+		clowns[3].setString("Abdeltawab");			clowns[4].setString("Faisal");				clowns[5].setString("Bebo");
+		clowns[3].setPosition(640, 205);			clowns[4].setPosition(5, 405);				clowns[5].setPosition(640, 405);
 
-	for (int i = 3; i < 9; i++) // new added text and changed positions
-	{
-		mmt[i].setFont(font);
-		mmt[i].setCharacterSize(48);
-		mmt[i].setStyle(Text::Bold);
-	}
+		// how to play 
+		Texture how_to_play[7];
+		how_to_play[0].loadFromFile("white-arrow-left.png");	how_to_play[1].loadFromFile("white-arrow-right.png");
+		how_to_play[2].loadFromFile("spacebar.png");			how_to_play[3].loadFromFile("apple.png");
+		how_to_play[4].loadFromFile("shield.png");				how_to_play[5].loadFromFile("tbooster.png");
+		how_to_play[6].loadFromFile("bbooster.png");
 
-	mmt[3].setString("Campaign");			mmt[4].setString("Survival");		mmt[7].setString("Exit");
-	mmt[3].setPosition(47, 15);				mmt[4].setPosition(65, 135);		mmt[7].setPosition(100, 495);
-	mmt[5].setString("how to play");		mmt[6].setString("Credits");		mmt[8].setString("highscores");
-	mmt[5].setPosition(43, 255);			mmt[6].setPosition(80, 375);		mmt[8].setPosition(43, 615);
+		Sprite HowNav[2]; for (int i = 0; i < 2; i++) { HowNav[i].setTexture(how_to_play[i]); } // for navigation in how to play 
+		HowNav[0].setScale(0.2, 0.1);		HowNav[0].setPosition(500, 650);
+		HowNav[1].setScale(0.2, 0.1);		HowNav[1].setPosition(640, 650);
 
-	for (int i = 0; i < 3; i++) // text in campaign menu
-	{
-		mmt[i].setFont(font);
-		mmt[i].setCharacterSize(50);
-		mmt[i].setStyle(Text::Bold);
-	}
-	mmt[0].setString("Scorched Earth");			mmt[1].setString("Ashes To Ashes");		mmt[2].setString("End of the Line");
-	mmt[0].setPosition(67, 70);					mmt[1].setPosition(67, 270);			mmt[2].setPosition(67, 470);
+		Sprite HowtoPlay[7]; for (int i = 0; i < 7; i++) { HowtoPlay[i].setTexture(how_to_play[i]); }
+		HowtoPlay[0].setScale(0.2, 0.2);		HowtoPlay[0].setPosition(5, 180);
+		HowtoPlay[1].setScale(0.2, 0.2);		HowtoPlay[1].setPosition(65, 180);
+		HowtoPlay[2].setScale(0.7, 0.2);		HowtoPlay[2].setPosition(5, 340);
+		HowtoPlay[3].setScale(0.14, 0.14);		HowtoPlay[3].setPosition(40, 100);
+		HowtoPlay[4].setScale(0.04, 0.04);		HowtoPlay[4].setPosition(30, 220);
+		HowtoPlay[5].setScale(0.03, 0.03);		HowtoPlay[5].setPosition(25, 335);
+		HowtoPlay[6].setScale(0.06, 0.06);		HowtoPlay[6].setPosition(40, 460);
 
-	//new
-	// credits
-	Text clowns[6];
-	for (int i = 0; i < 6; i++)
-	{
-		clowns[i].setFont(font);
-		clowns[i].setCharacterSize(100);
-		clowns[i].setStyle(Text::Bold);
-	}
-	clowns[0].setString("Hamed");				clowns[1].setString("Haitham");				clowns[2].setString("Andrew");
-	clowns[0].setPosition(5, 5);				clowns[1].setPosition(640, 5);				clowns[2].setPosition(5, 205);
-	clowns[3].setString("Abdeltawab");			clowns[4].setString("Faisal");				clowns[5].setString("Bebo");
-	clowns[3].setPosition(640, 205);			clowns[4].setPosition(5, 405);				clowns[5].setPosition(640, 405);
+		//movement
+		Text htp21[4];
+		for (int i = 0; i < 4; i++)
+		{
+			htp21[i].setFont(font);
+			htp21[i].setCharacterSize(50);
+			htp21[i].setStyle(Text::Bold);
+		}
+		htp21[0].setCharacterSize(100);		htp21[0].setFillColor(Color::Blue);
+		htp21[0].setString("Movement");		htp21[1].setString("left & right arrows to move");		htp21[2].setString("spacebar to shoot");
+		htp21[0].setPosition(400, 5);		htp21[1].setPosition(240, 200);							htp21[2].setPosition(240, 320);
+		htp21[3].setString("TIP :think well before shooting :) ");			htp21[3].setPosition(200, 590);
 
-	//new 
-	// how to play 
-	Texture how_to_play[7];
-	how_to_play[0].loadFromFile("white-arrow-left.png");	how_to_play[1].loadFromFile("white-arrow-right.png");
-	how_to_play[2].loadFromFile("spacebar.png");			how_to_play[3].loadFromFile("apple.png");
-	how_to_play[4].loadFromFile("shield.png");				how_to_play[5].loadFromFile("tbooster.png");
-	how_to_play[6].loadFromFile("bbooster.png");
+		//Campaign & Survival
+		Text htp22[5];
+		for (int i = 0; i < 5; i++)
+		{
+			htp22[i].setFont(font);
+			htp22[i].setCharacterSize(50);
+			htp22[i].setStyle(Text::Bold);
+		}
+		htp22[0].setString("Campaign & Survival");											htp22[0].setPosition(350, 0);	htp22[0].setFillColor(Color::Blue);
+		htp22[1].setString("200 is the required score to pass Scorched earth");				htp22[1].setPosition(5, 69);
+		htp22[2].setString("250 is the required score to pass Ashes To Ashes");				htp22[2].setPosition(5, 169);
+		htp22[3].setString("300 is the required score to pass End of the Line");			htp22[3].setPosition(5, 269);
+		htp22[4].setString("challenge yourself in survival mode and set your highscore");	htp22[4].setPosition(5, 369);
 
-	Sprite HowNav[2]; for (int i = 0; i < 2; i++) { HowNav[i].setTexture(how_to_play[i]); } // for navigation in how to play 
-	HowNav[0].setScale(0.2, 0.1);		HowNav[0].setPosition(500, 650);
-	HowNav[1].setScale(0.2, 0.1);		HowNav[1].setPosition(640, 650);
-
-	Sprite HowtoPlay[7]; for (int i = 0; i < 7; i++) { HowtoPlay[i].setTexture(how_to_play[i]); }
-	HowtoPlay[0].setScale(0.2, 0.2);		HowtoPlay[0].setPosition(5, 180);
-	HowtoPlay[1].setScale(0.2, 0.2);		HowtoPlay[1].setPosition(65, 180);
-	HowtoPlay[2].setScale(0.7, 0.2);		HowtoPlay[2].setPosition(5, 340);
-	HowtoPlay[3].setScale(0.14, 0.14);		HowtoPlay[3].setPosition(40, 100);
-	HowtoPlay[4].setScale(0.04, 0.04);		HowtoPlay[4].setPosition(30, 220);
-	HowtoPlay[5].setScale(0.03, 0.03);		HowtoPlay[5].setPosition(25, 335);
-	HowtoPlay[6].setScale(0.06, 0.06);		HowtoPlay[6].setPosition(40, 460);
-
-	//movement
-	Text htp21[4];
-	for (int i = 0; i < 4; i++)
-	{
-		htp21[i].setFont(font);
-		htp21[i].setCharacterSize(50);
-		htp21[i].setStyle(Text::Bold);
-	}
-	htp21[0].setCharacterSize(100);		htp21[0].setFillColor(Color::Blue);
-	htp21[0].setString("Movement");		htp21[1].setString("left & right arrows to move");		htp21[2].setString("spacebar to shoot");
-	htp21[0].setPosition(400, 5);		htp21[1].setPosition(240, 200);							htp21[2].setPosition(240, 320);
-	htp21[3].setString("TIP :think well before shooting :) ");			htp21[3].setPosition(200, 590);
-
-	//Campaign & Survival
-	Text htp22[5];
-	for (int i = 0; i < 5; i++)
-	{
-		htp22[i].setFont(font);
-		htp22[i].setCharacterSize(50);
-		htp22[i].setStyle(Text::Bold);
-	}
-	htp22[0].setString("Campaign & Survival");											htp22[0].setPosition(350, 0);	htp22[0].setFillColor(Color::Blue);
-	htp22[1].setString("200 is the required score to pass Scorched earth");				htp22[1].setPosition(5, 69);
-	htp22[2].setString("250 is the required score to pass Ashes To Ashes");				htp22[2].setPosition(5, 169);
-	htp22[3].setString("300 is the required score to pass End of the Line");			htp22[3].setPosition(5, 269);
-	htp22[4].setString("challenge yourself in survival mode and set your highscore");	htp22[4].setPosition(5, 369);
-
-	//Pickups
-	Text htp23[5];
-	for (int i = 0; i < 5; i++)
-	{
-		htp23[i].setFont(font);
-		htp23[i].setCharacterSize(50);
-		htp23[i].setStyle(Text::Bold);
-	}
-	htp23[0].setString("Pickups");		htp23[0].setCharacterSize(80);		htp23[0].setPosition(520, 0);	htp23[0].setFillColor(Color::Blue);
-	htp23[1].setString("apple : regenerates health");						htp23[1].setPosition(169, 100);
-	htp23[2].setString("armor : puts shield on tank");						htp23[2].setPosition(169, 220);
-	htp23[3].setString("accelrator : increase tank velocity");				htp23[3].setPosition(169, 340);
-	htp23[4].setString("thunder : increase bullet velocity");				htp23[4].setPosition(169, 460);
-
-	//new
+		//Pickups
+		Text htp23[5];
+		for (int i = 0; i < 5; i++)
+		{
+			htp23[i].setFont(font);
+			htp23[i].setCharacterSize(50);
+			htp23[i].setStyle(Text::Bold);
+		}
+		htp23[0].setString("Pickups");		htp23[0].setCharacterSize(80);		htp23[0].setPosition(520, 0);	htp23[0].setFillColor(Color::Blue);
+		htp23[1].setString("apple : regenerates health");						htp23[1].setPosition(169, 100);
+		htp23[2].setString("armor : puts shield on tank");						htp23[2].setPosition(169, 220);
+		htp23[3].setString("accelrator : increase tank velocity");				htp23[3].setPosition(169, 340);
+		htp23[4].setString("thunder : increase bullet velocity");				htp23[4].setPosition(169, 460);
+	//#################################################
+	
+	//bebo
 	//pause menu text
 	Text pmt[2];
 	for (int i = 0; i < 2; i++)
@@ -292,10 +309,9 @@ int main()
 	}
 	pmt[0].setString("Resume");		pmt[0].setPosition(0, 0);
 	pmt[1].setString("Main Menu");	pmt[1].setPosition(0, 150);
+	//#################################################
 
-
-
-
+	// haitham
 	//####################### sound ######################
 	//bullet
 	SoundBuffer music2;
@@ -312,12 +328,13 @@ int main()
 	music.openFromFile("Game audio1.wav");
 	music.setLoop("Game audio1.wav");
 	//music.play();
+	//#################################################
 
 	while (window.isOpen())
 	{
-		RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR
-		RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1005, 15); r2.setFillColor(Color::Red); //HEALTH BAR
-
+		
+		r1.setSize(Vector2f(b, 20)); r2.setSize(Vector2f(a, 20));//andrew...resize.bars..
+		
 		Event event; //to close window
 		while (window.pollEvent(event))
 		{
@@ -325,13 +342,14 @@ int main()
 				window.close();
 		}
 
+		//bebo
 		Vector2i mousepos = Mouse::getPosition(window);//to get position of mouse relative to window "easier than {Mouse ms;}"
 		//....................main..menu......
 		if (nav == 0)
 		{
 			// change color of campaign text
 			{
-				if (mousepos.x > 45 && mousepos.x < 255 && mousepos.y>25 && mousepos.y < 76 )
+				if (mousepos.x > 45 && mousepos.x < 255 && mousepos.y>25 && mousepos.y < 76)
 					color = 1;
 				else 			color = 0;
 
@@ -340,7 +358,7 @@ int main()
 			}
 			// change color of survival text // new changed numbers
 			{
-				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>145 && mousepos.y < 184 )
+				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>145 && mousepos.y < 184)
 					color = 1;
 				else 			color = 0;
 
@@ -349,7 +367,7 @@ int main()
 			}
 			// change color of how to play text //new
 			{
-				if (mousepos.x > 43 && mousepos.x < 274 && mousepos.y>265 && mousepos.y < 315 )
+				if (mousepos.x > 43 && mousepos.x < 274 && mousepos.y>265 && mousepos.y < 315)
 					color = 1;
 				else 			color = 0;
 
@@ -358,7 +376,7 @@ int main()
 			}
 			// change color of credits text //new
 			{
-				if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424 )
+				if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424)
 					color = 1;
 				else 			color = 0;
 
@@ -367,7 +385,7 @@ int main()
 			}
 			// change color of exit text // new vhanged numbers
 			{
-				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>505 && mousepos.y < 545 )
+				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>505 && mousepos.y < 545)
 					color = 1;
 				else            color = 0;
 
@@ -376,7 +394,7 @@ int main()
 			}
 			// change color of highscores text // new
 			{
-				if (mousepos.x > 43 && mousepos.x < 258 && mousepos.y>625 && mousepos.y < 665 )
+				if (mousepos.x > 43 && mousepos.x < 258 && mousepos.y>625 && mousepos.y < 665)
 					color = 1;
 				else            color = 0;
 
@@ -450,7 +468,8 @@ int main()
 				if (mousepos.x > 11 && mousepos.x < 140 && mousepos.y>650 && mousepos.y < 699 && nav == 23) nav = 22;// from pickups to campaign & survival
 			}
 		}
-
+		//#################################################
+		//hamed
 		if (nav == 11)
 		{
 			gbg.setTexture(lvl1);
@@ -501,8 +520,11 @@ int main()
 				score.setString(to_string(s));
 			}
 		}
+		//#################################################
+
 		//.................game.....
 		if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
+			//hamed
 			//######################## Movement ###############################
 				//1-tank
 			if (Keyboard::isKeyPressed(Keyboard::Right)) {
@@ -528,7 +550,9 @@ int main()
 					fired = 0;
 					s2.setPosition(800, 800);
 				}
+			//#################################################
 
+				//tebo
 				//repeat bombs&powerups movement
 				for (int i = 0; i < 10; i++) //bomb 1
 				{
@@ -563,8 +587,9 @@ int main()
 					sh[i].move(0, 8);
 				}
 				ss.move(0, 8); //sheild
+				//#################################################
 			}
-
+			//andrew
 			// #############################  collision  ########################
 			//tank and window
 			if (s1.getPosition().x <= 0 && Keyboard::isKeyPressed(Keyboard::Left)) {
@@ -688,6 +713,9 @@ int main()
 				s2.setPosition(1800, 800);
 				explosion.play();
 			}
+			//#################################################
+
+			//haitham
 			//#################### explosion animation #########################
 			for (int i = 0; i < 5; i++) {
 
@@ -739,12 +767,13 @@ int main()
 				}
 
 			}
-
+			//#################################################
 
 		}
 		//.................survival..mode.......
 		if (nav == 2) {
 			gbg.setTexture(tg);
+			//tebo
 			//....repeat movement
 			if (tb.getPosition().y > 720)//tank booster
 				tb.setPosition(rand() % 1200, -7200);
@@ -754,6 +783,8 @@ int main()
 			//....move
 			tb.move(0, 8); //tank booster
 			bb.move(0, 8); //bullet booster
+			//#################################################
+			//andrew
 						// #############################  collision  ########################
 			//tank booster with tank
 			if (s1.getGlobalBounds().intersects(tb.getGlobalBounds())) {
@@ -783,6 +814,9 @@ int main()
 				s2.setPosition(1800, 800);
 				explosion.play();
 			}
+			//#################################################
+
+			//hamed
 			//################  boosters effect  #################
 			if (tbb) {
 				if (tbc.getElapsedTime().asSeconds() > 10) {
@@ -800,20 +834,22 @@ int main()
 				speed += 2;
 				reqtime += 25;
 			}
+			//#################################################
 			survcnt = survt.getElapsedTime().asSeconds();
 		}
-
+		//bebo
+		//navigation after losing
 		if (h <= 0) {
 			if (nav == 2)
 				nav = 32;
 			if (nav == 11 | nav == 12 | nav == 13)
 				nav = 31;
 		}
+		//#################################################
 
-
-		if (shi <= 0)
+		if (shi <= 0)//andrew
 			shon = 0;
-
+		//bebo
 		// ################ pause menu and go back###########
 		if (Keyboard::isKeyPressed(Keyboard::Escape))
 		{	//new added numbers
@@ -880,9 +916,11 @@ int main()
 
 			}
 		}
+		//#################################################
 
 		//#################### draw ###################
 		window.clear();
+		//faisl
 		//main menu
 		if (nav == 0) // main menu
 		{
@@ -941,19 +979,19 @@ int main()
 				window.draw(HowtoPlay[i]);
 			}
 		}
-
-
-
-
+		//#################################################
 
 		//####### game  #######
 		if (nav == 2 || nav == 11 || nav == 12 || nav == 13)
 		{
 			window.draw(gbg);
+			//hamed
 			window.draw(s1);
 			window.draw(s2);
+			//#################################################
 
 			if (bound) {
+				//tebo
 				for (int i = 0; i < 10; i++) //bomb 1
 				{
 					window.draw(b1[i]);
@@ -967,13 +1005,16 @@ int main()
 					window.draw(sh[i]);
 				}
 				window.draw(ss);//sheild
+				//#################################################
+				//andrew
 				window.draw(r1);// sheild bar
 				window.draw(r2);// health bar
 				// text for score health sheild
 				window.draw(score);	window.draw(health);
 				if (shon)
 					window.draw(sheild);
-
+				//#################################################
+				//haitham
 				//nuke explosion
 				for (int i = 0; i < 5; i++) {
 					window.draw(exp2[i]);
@@ -982,6 +1023,8 @@ int main()
 				for (int i = 0; i < 10; i++) {
 					window.draw(exp1[i]);
 				}
+				//#################################################
+
 			}
 		}
 		if (nav == 2)
@@ -992,6 +1035,7 @@ int main()
 			if (bbb)
 				window.draw(bbi);
 		}
+		//faisl
 		//#######  ending  #######
 		endgame[2].setString("Score: " + to_string(s));
 		endgame[3].setString("Time: " + to_string(survcnt / 60) + ":" + to_string(survcnt % 60));
@@ -1013,6 +1057,7 @@ int main()
 				window.draw(movegame);
 			}
 		}
+		//#################################################
 
 		window.display();
 	}
