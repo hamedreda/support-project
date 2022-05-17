@@ -845,7 +845,7 @@ int main()
 		}
 		//bebo
 		//navigation after losing
-		if (h <= 0) {++
+		if (h <= 0) {
 			if (nav == 2)
 				nav = 32;
 			if (nav == 11 || nav == 12 || nav == 13)
@@ -861,7 +861,7 @@ int main()
 		{	//new added numbers
 			if (nav == 1 || nav == 3 || nav == 4 || nav == 21 || nav == 22 || nav == 23)nav = 0;// go from campaign menu to main menu // new added credits and how to play and highscores
 			if (nav == 2 || nav == 11 || nav == 12 || nav == 13)  pause = 1; //pause the game
-			if (nav == 32 || nav == 31) main(); // play again
+			if (nav == 32 || nav == 31) { music.stop(); main(); } // play again
 
 		}
 		// new pause menu loop
