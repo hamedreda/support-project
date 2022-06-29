@@ -1,25 +1,26 @@
 #include <SFML/Graphics.hpp>;
 #include <SFML/Audio.hpp>;
 using namespace sf;
-using namespace std;
+using namespace std; 
+int h = 100, shi = 0, s = 0,a = 250, b = 0,pass=0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE ,HEALTH,SHEILD BAR
+bool passed[2] = {};
 
-// tebo 
+// tebo
 Sprite b1[10], b2[5], sh[3], ss;// spr arr FOR BOMBS& SHIELD,apple
-void setter() { //bomb1
-	for (int i = 0; i < 10; i++) { b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //nuke
-	for (int i = 0; i < 5; i++) { b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //apple
-	for (int i = 0; i < 3; i++) { sh[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //SHIELD
-	ss.setPosition(rand() % 1200, -5040); } //#################################################
-RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW 
-int main() { window.setFramerateLimit(40); //fps
-
-//andrew
-int a = 250, b = 0; //for HEALTH,SHEILD BAR
-int h = 100, shi = 0, s = 0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE 
+void setter() { //bomb1 
+	for (int i = 0; i < 10; i++) { b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //nuke 
+	for (int i = 0; i < 5; i++) { b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //apple 
+	for (int i = 0; i < 3; i++) { sh[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //SHIELD 
+	ss.setPosition(rand() % 1200, -5040); shi = 0; s = 0; b = 0; } 
+Music music; 
+//################################################# 
+RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
+int main() 
+{ window.setFramerateLimit(40); //fps //random movement in the background 
+bool random = 1; int mode = 0; Clock movement; //andrew
 bool shon = 0; //bool for sheild
-RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR
-RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1005, 15); r2.setFillColor(Color::Red); //HEALTH BAR
-//#################################################
+RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR 
+RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1005, 15); r2.setFillColor(Color::Red); //HEALTH BAR //#################################################
 
 int nav = 0; bool pause = 0;//bebo....navigation and pause game
 
@@ -55,6 +56,7 @@ for (int i = 0; i < 5; i++) {
 //#################################################
 
 Font f; f.loadFromFile("font.ttf"); //FONT
+
 //andrew
 						// TEXT FOR SCORE & HEALTH & SHEILD :
 Text score, health, sheild;
@@ -157,9 +159,21 @@ backToMain.setFont(ending);
 backToMain.setCharacterSize(50);
 backToMain.setFillColor(Color::Red);
 backToMain.setString("press Esc to go back to Main Menu");
-backToMain.setPosition(300, 400);
+backToMain.setPosition(300, 430);
 
-// 5-  the cover that holds the text inside it 
+// 5-  the cover that holds the text inside it & lvl photos
+Texture bw[3], colored[3];
+bw[0].loadFromFile("lvl1bw.jpeg");
+bw[1].loadFromFile("lvl2bw.jpeg");
+bw[2].loadFromFile("lvl3bw.jpeg");
+colored[0].loadFromFile("lvl1colored.jpeg");
+colored[1].loadFromFile("lvl2colored.jpeg");
+colored[2].loadFromFile("lvl3colored.jpeg");
+Sprite lvlbw[3], lvlcolored[3];
+for (int i = 0; i < 3; i++) {
+	lvlbw[i].setTexture(bw[i]);
+	lvlcolored[i].setTexture(colored[i]);
+}
 Texture textcover;
 textcover.loadFromFile("TextCover.png");
 Sprite textCover[8];
@@ -181,9 +195,13 @@ for (int i = 0; i < 3; i++) //new changed numbers
 	textCover[i].setScale(2, 2);
 	textCover[i].setTexture(textcover);
 }
-textCover[0].setPosition(0, 0);
-textCover[1].setPosition(0, 200);
-textCover[2].setPosition(0, 400);
+lvlbw[0].setPosition(0, 0);
+lvlbw[1].setPosition(0, 250);
+lvlbw[2].setPosition(0, 470);
+lvlcolored[0].setPosition(1600, 0);
+lvlcolored[1].setPosition(1600, 250);
+lvlcolored[2].setPosition(1600, 470);
+
 
 //############ main menu text ############
 Font font;		  Text mmt[8];		bool color = 0;
@@ -320,29 +338,29 @@ music1.loadFromFile("explosion.wav");
 Sound explosion;
 explosion.setBuffer(music1);
 //game
-Music music;
+
 music.openFromFile("Game audio1.wav");
 music.setLoop("Game audio1.wav");
 music.play();
 //#################################################
-//arrow 
+////arrowww
 Sprite arrow;
 Texture arrw;
 int zz = 0;
 arrw.loadFromFile("right arrow.png");
 arrow.setTexture(arrw);
-arrow.setTextureRect(IntRect(0,0,200,188));
+arrow.setTextureRect(IntRect(0, 0, 200, 188));
 arrow.setPosition(1100, 0);
 arrow.setScale(0.7, 0.7);
 bool levelup = 0;
 Clock arrowcnt;
 //########################################################
 //damage counter
-int dmgt = 0,bombcnt=0,nukecnt=0;
-//text
+int dmgt = 0, bombcnt = 0, nukecnt = 0;
+//text for stats
 Text bombn, nuken, dmg;
 bombn.setFont(ending);
-bombn.setString("Number of bombs destroyed:"+ to_string(bombcnt));
+bombn.setString("Number of bombs destroyed:" + to_string(bombcnt));
 bombn.setFillColor(Color::Red);
 bombn.setPosition(300, 550);
 nuken.setFont(ending);
@@ -350,13 +368,66 @@ nuken.setString("Number of nukes destroyed: " + to_string(nukecnt));
 nuken.setFillColor(Color::Red);
 nuken.setPosition(300, 600);
 dmg.setFont(ending);
-dmg.setString("Damage taken: "+to_string(dmgt));
+dmg.setString("Damage taken: " + to_string(dmgt));
 dmg.setFillColor(Color::Red);
 dmg.setPosition(300, 650);
 
 while (window.isOpen())
 {
+	if (pass == 1)
+		passed[0] = 1;
+	if (pass == 2)
+		passed[1] = 1;
+	if (nav == 1) {
+		a = 250, b = 0;
+		h = 100, shi = 0, s = 0;
+	}
+	sheild.setString(to_string(shi));
+	score.setString(to_string(s));
+	health.setString(to_string(h));
+	if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::Space)) {
+		random = 0;
+		movement.restart();
 
+	}
+	if (movement.getElapsedTime().asSeconds() > 10) {
+		random = 1;
+	}
+	if (nav == 0) {
+		if (random) {
+			//bool random int mode clock movemnt
+			if (mode == 0) {
+				s1.move(7, 0);
+			}
+			if (mode == 1) {
+				s1.move(-7, 0);
+			}
+
+			if (movement.getElapsedTime().asSeconds() > 1) {
+				mode = rand() % 3;
+				movement.restart();
+			}
+			if (s1.getPosition().x <= 0 && mode == 1) {
+				s1.move(tc * 7, 0);
+			}
+			if (s1.getPosition().x >= 1184.8 && mode == 0) {
+				s1.move(tc * -7, 0);
+			}
+			if (mode == 2 && fired == 0) {
+				fired = 1;
+				s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
+				shoot.play();
+			}
+			if (fired) {
+				s2.move(0, -10 * bc);
+			}
+
+			if (s2.getPosition().y < 0) {
+				fired = 0;
+				s2.setPosition(800, 800);
+			}
+		}
+	}
 	r1.setSize(Vector2f(b, 20)); r2.setSize(Vector2f(a, 20));//andrew...resize.bars..
 
 	Event event; //to close window
@@ -421,9 +492,16 @@ while (window.isOpen())
 		//################# Navigation from main menu ##################
 		if (Mouse::isButtonPressed(Mouse::Left))
 		{
-			if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80)   nav = 1; // to campaign "click on campaign"
+			if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80) {
+				movement.restart(); nav = 1;
+			} // to campaign "click on campaign"
 			if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>145 && mousepos.y < 184) {
 				nav = 2;
+				setter();
+				s1.setPosition(20, 600);
+				s2.setPosition(800, 720);
+				h = 100;
+				a = 250;
 				survt.restart();
 			}// to survival "click on survival"
 			if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424) nav = 3; // from main menu to credits
@@ -437,38 +515,41 @@ while (window.isOpen())
 	{
 		// change color of scorched earth text
 		{
-			if (mousepos.x > 67 && mousepos.x < 393 && mousepos.y>78 && mousepos.y < 120)
+			if (mousepos.y > 0 && mousepos.y < 250)
 				color = 1;
 			else 			color = 0;
 
-			if (!color)		mmt[0].setFillColor(Color::White);
-			if (color)		mmt[0].setFillColor(Color::Blue);
+			if (!color)		lvlcolored[0].setPosition(1600, 0);
+			if (color)		lvlcolored[0].setPosition(0, 0);
 		}
 		// change color of ashes to ashes text
 		{
-			if (mousepos.x > 67 && mousepos.x < 390 && mousepos.y>278 && mousepos.y < 320)
+			if (mousepos.y > 250 && mousepos.y < 470 && passed[0])
 				color = 1;
 			else 			color = 0;
 
-			if (!color)		mmt[1].setFillColor(Color::White);
-			if (color)		mmt[1].setFillColor(Color::Blue);
+			if (!color)		lvlcolored[1].setPosition(1600, 0);
+			if (color)		lvlcolored[1].setPosition(0, 250);
 		}
 		// change color of end of the line text
 		{
-			if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520)
+			if (mousepos.y > 470 && mousepos.y < 750 && passed[1])
 				color = 1;
 			else            color = 0;
 
-			if (!color)		mmt[2].setFillColor(Color::White);
-			if (color)		mmt[2].setFillColor(Color::Blue);
+			if (!color)		lvlcolored[2].setPosition(1600, 0);
+			if (color)		lvlcolored[2].setPosition(0, 470);
+
 		}
 		//################# Navigation in campaign ##################
-		if (Mouse::isButtonPressed(Mouse::Left))
-		{
-			if (mousepos.x > 67 && mousepos.x < 393 && mousepos.y>78 && mousepos.y < 120) nav = 11;//play scorched earth  "1st level"
-			if (mousepos.x > 67 && mousepos.x < 390 && mousepos.y>278 && mousepos.y < 320)nav = 12;//play ashes to ashes  "2nd level"
-			if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520)nav = 13;//play end of the line "3rd level"
-		}
+		if (movement.getElapsedTime().asSeconds() > 0.5)
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+
+				if (mousepos.y > 0 && mousepos.y < 250) { nav = 11; setter(); h = 100; a = 250; }//play scorched earth  "1st level"
+				if (mousepos.y > 250 && mousepos.y < 470 && passed[0]) { nav = 12; setter(); }//play ashes to ashes  "2nd level"
+				if (mousepos.y > 470 && mousepos.y < 720 && passed[1]) { nav = 13; setter(); }//play end of the line "3rd level"
+			}
 	}
 	//...................How to Play...........
 	if (nav == 21 || nav == 22 || nav == 23)
@@ -492,17 +573,15 @@ while (window.isOpen())
 		if (s >= reqscore)
 		{
 			bound = 0;
+			pass = 1;
 			setter();
 			levelup = 1;
-			
-
 		}
 		if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
 		{
 			bound = 1;
 			s1.setPosition(20, 600);
 			s = 0;
-			score.setString(to_string(s));
 			nav = 12;
 			levelup = 0;
 		}
@@ -512,19 +591,18 @@ while (window.isOpen())
 		reqscore = 250;
 		if (s >= reqscore)
 		{
+			pass = 2;
+			levelup = 1;
 			bound = 0;
 			setter();
-			levelup = 1;
-			
 		}
 		if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
 		{
 			bound = 1;
 			s1.setPosition(20, 600);
 			s = 0;
-			score.setString(to_string(s));
-			nav = 13;
 			levelup = 0;
+			nav = 13;
 		}
 	}
 	if (nav == 13)
@@ -540,13 +618,14 @@ while (window.isOpen())
 			bound = 1;
 			s1.setPosition(20, 600);
 			s = 0;
-			score.setString(to_string(s));
+
 		}
 	}
 	//#################################################
 
 	//.................game.....
-	if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
+
+	if (nav == 2 || nav == 11 || nav == 12 || nav == 13 || nav == 0 || nav == 1) {
 		//hamed
 		//######################## Movement ###############################
 			//1-tank
@@ -625,17 +704,15 @@ while (window.isOpen())
 		//bombs with the tank
 		for (int i = 0; i < 10; i++) {
 			if (s1.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
-				dmgt += 10;
 				b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+				dmgt += 10 ;
 				if (shon)
 				{
 					shi -= 10;
-					sheild.setString(to_string(shi));
 					b -= 25;
 				}
 				else {
 					h -= 10;
-					health.setString(to_string(h));
 					a -= 25;
 				}
 				explosion.play();
@@ -644,25 +721,21 @@ while (window.isOpen())
 		//nuke with tank
 		for (int i = 0; i < 5; i++) {
 			if (s1.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
-				dmgt += 30;
 				b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+				dmgt += 30;
 				if (shon && shi < 30) {
 					h -= 30 - shi;
 					a -= 75 - b;
-					health.setString(to_string(h));
 					shi = 0;
-					sheild.setString(to_string(shi));
 					b = 0;
 				}
 				else if (shon)
 				{
 					shi -= 30;
-					sheild.setString(to_string(shi));
 					b -= 75;
 				}
 				else {
 					h -= 30;
-					health.setString(to_string(h));
 					a -= 75;
 				}
 				explosion.play();
@@ -674,7 +747,6 @@ while (window.isOpen())
 				sh[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 				if (h < 100)
 					h += 10;
-				health.setString(to_string(h));
 				if (a < 250)
 					a += 25;
 			}
@@ -685,7 +757,6 @@ while (window.isOpen())
 			shi += 50;
 			if (shi > 100)
 				shi = 100;
-			sheild.setString(to_string(shi));
 			b += 125;
 			if (b > 250)
 				b = 250;
@@ -699,7 +770,6 @@ while (window.isOpen())
 				exp2[i].setPosition(b2[i].getPosition().x - 100, b2[i].getPosition().y - 65);
 				b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 				s += 10;
-				score.setString(to_string(s));
 				fired = 0;
 				s2.setPosition(800, 800);
 				collided2[i] = 1;
@@ -715,7 +785,6 @@ while (window.isOpen())
 				exp1[i].setPosition(b1[i].getPosition().x - 50, b1[i].getPosition().y - 30);
 				b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 				s += 10;
-				score.setString(to_string(s));
 				fired = 0;
 				s2.setPosition(800, 800);
 				explosion.play();
@@ -796,6 +865,9 @@ while (window.isOpen())
 		}
 		//#################################################
 
+	}
+	if (nav == 0 || nav == 1) {
+		gbg.setTexture(tg);
 	}
 	//.................survival..mode.......
 	if (nav == 2) {
@@ -882,7 +954,7 @@ while (window.isOpen())
 	{	//new added numbers
 		if (nav == 1 || nav == 3 || nav == 4 || nav == 21 || nav == 22 || nav == 23)nav = 0;// go from campaign menu to main menu // new added credits and how to play and highscores
 		if (nav == 2 || nav == 11 || nav == 12 || nav == 13)  pause = 1; //pause the game
-		if (nav == 32 || nav == 31) { music.stop(); main(); } // play again
+		if (nav == 32 || nav == 31) { music.pause(); main(); } // play again
 
 	}
 	// new pause menu loop
@@ -946,11 +1018,11 @@ while (window.isOpen())
 	//#################################################
 	if (levelup) {
 		if (arrowcnt.getElapsedTime().asSeconds() > 0.25) {
-		zz++;
-		zz %= 3;
-		arrow.setTextureRect(IntRect(zz * 200, 0, 200, 188));
-		arrowcnt.restart();
-	     
+			zz++;
+			zz %= 3;
+			arrow.setTextureRect(IntRect(zz * 200, 0, 200, 188));
+			arrowcnt.restart();
+
 		}
 	}
 	//#########################
@@ -963,9 +1035,11 @@ while (window.isOpen())
 	window.clear();
 	//faisl
 	//main menu
+	window.draw(gbg);
+
 	if (nav == 0) // main menu
 	{
-		window.draw(ibg);
+
 		for (int i = 3; i < 8; i++) // new changed numbers
 		{
 			window.draw(textCover[i]);
@@ -975,12 +1049,15 @@ while (window.isOpen())
 	}
 	if (nav == 1) // campaign menu
 	{
-		window.draw(ibg);
+
 		for (int i = 0; i < 3; i++)
 		{
-			window.draw(textCover[i]);
+			window.draw(lvlbw[i]);
+			window.draw(lvlcolored[i]);
 			window.draw(mmt[i]);
+
 		}
+
 	}
 	if (nav == 3) //credits
 	{
@@ -1023,14 +1100,13 @@ while (window.isOpen())
 				window.draw(HowtoPlay[i]);
 			}
 		}
-		
 	}
 	//#################################################
 
 	//####### game  #######
-	if (nav == 2 || nav == 11 || nav == 12 || nav == 13)
+	if (nav == 2 || nav == 11 || nav == 12 || nav == 13 || nav == 0)
 	{
-		window.draw(gbg);
+
 		//hamed
 		window.draw(s1);
 		window.draw(s2);
@@ -1053,10 +1129,12 @@ while (window.isOpen())
 			window.draw(ss);//sheild
 			//#################################################
 			//andrew
-			window.draw(r1);// sheild bar
-			window.draw(r2);// health bar
-			// text for score health sheild
-			window.draw(score);	window.draw(health);
+			if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
+				window.draw(r1);// sheild bar
+				window.draw(r2);// health bar
+				// text for score health sheild
+				window.draw(score);	window.draw(health);
+			}
 			if (shon)
 				window.draw(sheild);
 			//#################################################
@@ -1091,27 +1169,17 @@ while (window.isOpen())
 		{
 			window.draw(endgame[0]);
 			window.draw(backToMain);
-			window.draw(nuken);
-			window.draw(dmg);
-			window.draw(bombn);
 		}
 		if (h <= 0) {
 			window.draw(endgame[1]);
 			window.draw(endgame[2]);
 			window.draw(backToMain);
-			window.draw(nuken);
-			window.draw(dmg);
-			window.draw(bombn);
-		
 		}
 	}
 	if (nav == 32) {
 		window.draw(endgame[2]);
 		window.draw(endgame[3]);
 		window.draw(backToMain);
-		window.draw(nuken);
-		window.draw(dmg);
-		window.draw(bombn);
 	}
 	if (s >= reqscore) {
 		if (nav == 11 || nav == 12 || nav == 13) {
@@ -1122,6 +1190,12 @@ while (window.isOpen())
 		window.draw(arrow);
 
 	}
+	if (nav == 31 || nav == 32) {
+		window.draw(dmg);
+		window.draw(bombn);
+		window.draw(nuken);
+	}
+
 	//#################################################
 
 	window.display();
