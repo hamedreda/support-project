@@ -1,9 +1,56 @@
-#include <SFML/Graphics.hpp>;
-#include <SFML/Audio.hpp>;
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <TextBox.h>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 using namespace sf;
 using namespace std;
+#define binFilePath "login.bin"
+struct account {
+	string username, email, password;
+	int score;
+};
+int h = 100, shi = 0, s = 0, a = 250, b = 0, pass = 0, id = 2; //VARIABLES FOR HEALTH ,SHEILD ,SCORE ,HEALTH,SHEILD BAR
+bool passed[2] = {};
+
+
 
 // tebo
+void load(account acc, string filePath) {
+	try {
+		ofstream fout(filePath, ios::binary | ios::out | ios::app);
+		fout.write((char*)&acc, sizeof(acc));
+		fout.close();
+	}
+	catch (exception& e) {
+		cout << "error: " << e.what() << endl;
+	}
+}
+vector<account*> download(string filePath) {
+	vector<account*> fileAccount;
+	string line;
+	try {
+		ifstream fin(filePath, ios::in | ios::binary | ios::ate);
+		if (fin.is_open()) {
+			streampos size = fin.tellg();
+			char* block = new char[size];
+			fin.seekg(0, ios::beg);
+			fin.read(block, size);
+			fin.close();
+			long long byteIndex = 0;
+			while (byteIndex < size) {
+				account* acc = (account*)(block + byteIndex);
+				fileAccount.push_back(acc);
+				byteIndex += sizeof(account);
+			}
+		}
+		else { cout << "Unable to open the file..." << endl; }
+	}
+	catch (exception& e) { cout << "error: " << e.what() << endl; }
+	return fileAccount;
+}
 Sprite b1[10], b2[5], sh[3], ss;// spr arr FOR BOMBS& SHIELD,apple
 void setter() {
 	//bomb1
@@ -23,22 +70,36 @@ void setter() {
 	}
 	//SHIELD
 	ss.setPosition(rand() % 1200, -5040);
+	shi = 0;
+	s = 0;
+	b = 0;
 }
+Music music;
 //#################################################
 RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
 int main()
 {
 	window.setFramerateLimit(40); //fps
-
+	//set the background of old paper of login
+	Texture log; log.loadFromFile("paper.png");
+	Sprite login; login.setTexture(log); login.setPosition(-50, -50); login.setScale(1.1, 1.1);
+	bool invalidBool = false;
+	bool emptyCellBool = false;
+	bool pwMatchBool = false;
+	bool available = true;
+	account accToLoad, accToGet, accToCheck;
+	account arr[2] = {};
+	//random movement in the background
+	bool random = 1;
+	int mode = 0;
+	Clock movement;
 	//andrew
-	int a = 250, b = 0; //for HEALTH,SHEILD BAR
-	int h = 100, shi = 0, s = 0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE 
 	bool shon = 0; //bool for sheild
 	RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR
 	RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1005, 15); r2.setFillColor(Color::Red); //HEALTH BAR
 	//#################################################
-
-	int nav = 0; bool pause = 0;//bebo....navigation and pause game
+	// nav now equals 8 => referring to the logoin page nave number (8=> page, 9=> sign_in, 10=> sign-up)
+	int nav = 8; bool pause = 0;//bebo....navigation and pause game
 
 	bool bound = 1;	//tebo..for boundries
 	//hamed
@@ -75,13 +136,65 @@ int main()
 
 	//andrew
 							// TEXT FOR SCORE & HEALTH & SHEILD :
-	Text score, health, sheild;
-	score.setFont(f);					health.setFont(f);					sheild.setFont(f);
-	score.setString(to_string(s));	    health.setString(to_string(h));		sheild.setString(to_string(shi));
-	score.setPosition(15, -5);		    health.setPosition(950, -10);		sheild.setPosition(950, 30);
-	score.setFillColor(Color::Yellow);  health.setFillColor(Color::Yellow);
-	score.setCharacterSize(50);		    health.setCharacterSize(50);		sheild.setCharacterSize(50);
+	Text score, health, sheild, usernameSignIn, passwordSignIn, emailSignUp, confirmPassword, invalid, emptyCell, pwMatch, highscore, hScore, ava;																			//new text for login page				also new
+	score.setFont(f);					health.setFont(f);					sheild.setFont(f);					usernameSignIn.setFont(f);				passwordSignIn.setFont(f);
+	score.setString(to_string(s));	    health.setString(to_string(h));		sheild.setString(to_string(shi));	usernameSignIn.setString("User Name: ");	passwordSignIn.setString("Password: ");
+	score.setPosition(15, -5);		    health.setPosition(950, -10);		sheild.setPosition(950, 30);		usernameSignIn.setPosition(100, 100);		passwordSignIn.setPosition(100, 250);
+
+	score.setFillColor(Color::Yellow);  health.setFillColor(Color::Yellow);										
+	score.setCharacterSize(50);		    health.setCharacterSize(50);		sheild.setCharacterSize(50);		usernameSignIn.setCharacterSize(70);		passwordSignIn.setCharacterSize(70);
+
+	emailSignUp.setFont(f);
+	emailSignUp.setString("E-Mail: ");
+	emailSignUp.setPosition(100, 200);
+	emailSignUp.setCharacterSize(70);
+	confirmPassword.setFont(f);
+	confirmPassword.setString("Confirm Password: ");
+	confirmPassword.setPosition(100, 400);
+	confirmPassword.setCharacterSize(70);
+	invalid.setFont(f);
+	invalid.setString("Invalid data, Please enter valid data or sign-up.");
+	invalid.setPosition(300, 400);
+	invalid.setFillColor(Color::Red);
+	invalid.setCharacterSize(50);
+	emptyCell.setFont(f);
+	emptyCell.setString("Required information missing, Please fill in empty cells.");
+	emptyCell.setPosition(300, 400);
+	emptyCell.setFillColor(Color::Red);
+	emptyCell.setCharacterSize(50);
+	pwMatch.setFont(f);
+	pwMatch.setString("Please make sure that password matches confirm password.");
+	pwMatch.setPosition(200, 620);
+	pwMatch.setFillColor(Color::Red);
+	pwMatch.setCharacterSize(50);
+	ava.setFont(f);
+	ava.setString("OOPS...! Account exists");
+	ava.setPosition(500, 620);
+	ava.setFillColor(Color::Red);
+	ava.setCharacterSize(50);
+	highscore.setFont(f);
+	highscore.setString("Survival high score: ");
+	highscore.setPosition(500, 150);
+	highscore.setFillColor(Color::Red);
+	highscore.setCharacterSize(50);
+	hScore.setFont(f);
+	hScore.setPosition(650, 250);
+	hScore.setFillColor(Color::Red);
+	hScore.setCharacterSize(50);
 	//#################################################
+	//TextBoxes of login################
+	Textbox usernameSignInTyped(50, Color::White, false);
+	usernameSignInTyped.setFont(f);
+	Textbox passwordSignInTyped(50, Color::White, false);
+	passwordSignInTyped.setFont(f);
+	Textbox emailSignUpTyped(50, Color::White, false);
+	emailSignUpTyped.setFont(f);
+	Textbox confirmPasswordTyped(50, Color::White, false);
+	confirmPasswordTyped.setFont(f);
+	Textbox usernameSignUpTyped(50, Color::White, false);
+	usernameSignUpTyped.setFont(f);
+	Textbox passwordSignUpTyped(50, Color::White, false);
+	passwordSignUpTyped.setFont(f);
 
 	//hamed
 	//1-tank
@@ -177,10 +290,22 @@ int main()
 	backToMain.setString("press Esc to go back to Main Menu");
 	backToMain.setPosition(300, 500);
 
-	// 5-  the cover that holds the text inside it 
+	// 5-  the cover that holds the text inside it & lvl photos
+	Texture bw[3], colored[3];
+	bw[0].loadFromFile("lvl1bw.jpeg");
+	bw[1].loadFromFile("lvl2bw.jpeg");
+	bw[2].loadFromFile("lvl3bw.jpeg");
+	colored[0].loadFromFile("lvl1colored.jpeg");
+	colored[1].loadFromFile("lvl2colored.jpeg");
+	colored[2].loadFromFile("lvl3colored.jpeg");
+	Sprite lvlbw[3], lvlcolored[3];
+	for (int i = 0; i < 3; i++) {
+		lvlbw[i].setTexture(bw[i]);
+		lvlcolored[i].setTexture(colored[i]);
+	}
 	Texture textcover;
 	textcover.loadFromFile("TextCover.png");
-	Sprite textCover[8];
+	Sprite textCover[13];
 	//############# Main menu ###############
 	for (int i = 3; i < 8; i++)
 	{
@@ -192,6 +317,9 @@ int main()
 	textCover[5].setPosition(0, 240);
 	textCover[6].setPosition(0, 360);
 	textCover[7].setPosition(0, 480);
+	textCover[12].setScale(1.3, 1);
+	textCover[12].setTexture(textcover);
+	textCover[12].setPosition(0, 600);
 
 	//############# Campaign menu ############## 
 	for (int i = 0; i < 3; i++) //new changed numbers
@@ -199,12 +327,26 @@ int main()
 		textCover[i].setScale(2, 2);
 		textCover[i].setTexture(textcover);
 	}
-	textCover[0].setPosition(0, 0);
-	textCover[1].setPosition(0, 200);
-	textCover[2].setPosition(0, 400);
+	// added three more elements to the array for login page (sign_up, sign_in and done)
+	for (int i = 8; i < 11; i++)
+	{
+		textCover[i].setTexture(textcover);
+		textCover[i].setPosition(500, 100+(200*(i-8)));
+		textCover[i].setScale(1.3, 1.3);
+	}
+	lvlbw[0].setPosition(0, 0);
+	lvlbw[1].setPosition(0, 250);
+	lvlbw[2].setPosition(0, 470);
+	lvlcolored[0].setPosition(1600, 0);
+	lvlcolored[1].setPosition(1600, 250);
+	lvlcolored[2].setPosition(1600, 470);
+	textCover[11].setTexture(textcover);
+	textCover[11].setPosition(540,620);
+	textCover[11].setScale(1, 1);
+
 
 	//############ main menu text ############
-	Font font;		  Text mmt[8];		bool color = 0;
+	Font font;		  Text mmt[13];		bool color = 0;
 	font.loadFromFile("Top Secret Stamp.ttf");
 
 	for (int i = 3; i < 8; i++)
@@ -214,10 +356,10 @@ int main()
 		mmt[i].setStyle(Text::Bold);
 	}
 
-	mmt[3].setString("Campaign");			mmt[4].setString("Survival");		mmt[7].setString("Exit");
-	mmt[3].setPosition(47, 15);				mmt[4].setPosition(65, 135);		mmt[7].setPosition(100, 495);
-	mmt[5].setString("how to play");		mmt[6].setString("Credits");
-	mmt[5].setPosition(43, 255);			mmt[6].setPosition(80, 375);
+	mmt[3].setString("Campaign");			mmt[4].setString("Survival");		mmt[7].setString("High score");
+	mmt[3].setPosition(47, 15);				mmt[4].setPosition(65, 135);		mmt[7].setPosition(50, 495);
+	mmt[5].setString("how to play");		mmt[6].setString("Credits");		mmt[13].setString("Exit");
+	mmt[5].setPosition(43, 255);			mmt[6].setPosition(80, 375);		mmt[13].setPosition(100, 615);
 	// text in campaign menu
 	for (int i = 0; i < 3; i++)
 	{
@@ -227,7 +369,20 @@ int main()
 	}
 	mmt[0].setString("Scorched Earth");			mmt[1].setString("Ashes To Ashes");		mmt[2].setString("End of the Line");
 	mmt[0].setPosition(67, 70);					mmt[1].setPosition(67, 270);			mmt[2].setPosition(67, 470);
-
+	for (int i = 8; i < 13; i++)
+	{
+		mmt[i].setFont(font);
+		mmt[i].setCharacterSize(50);
+		mmt[i].setStyle(Text::Bold);
+	}
+	mmt[8].setString("Sign_In");			mmt[9].setString("Sign-Up");		mmt[10].setString("Done");
+	mmt[8].setPosition(567, 130);					mmt[9].setPosition(567, 330);			mmt[10].setPosition(600, 530);
+	mmt[11].setString("Sign-up");
+	mmt[11].setPosition(605, 650);
+	mmt[11].setCharacterSize(30);
+	mmt[12].setString("Exit");
+	mmt[12].setPosition(100, 615);
+	mmt[12].setCharacterSize(50);
 	// credits
 	Text clowns[6];
 	for (int i = 0; i < 6; i++)
@@ -338,7 +493,7 @@ int main()
 	Sound explosion;
 	explosion.setBuffer(music1);
 	//game
-	Music music;
+
 	music.openFromFile("Game audio1.wav");
 	music.setLoop("Game audio1.wav");
 	music.play();
@@ -346,7 +501,60 @@ int main()
 
 	while (window.isOpen())
 	{
+		if (pass == 1)
+			passed[0] = 1;
+		if (pass == 2)
+			passed[1] = 1;
+		if (nav == 1) {
+			a = 250, b = 0;
+			h = 100, shi = 0, s = 0;
+		}
+		sheild.setString(to_string(shi));
+		score.setString(to_string(s));
+		health.setString(to_string(h));
+		if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::Space)) {
+			random = 0;
+			movement.restart();
 
+		}
+		if (movement.getElapsedTime().asSeconds() > 10) {
+			random = 1;
+		}
+		if (nav == 0) {
+			if (random) {
+				//bool random int mode clock movemnt
+				if (mode == 0) {
+					s1.move(7, 0);
+				}
+				if (mode == 1) {
+					s1.move(-7, 0);
+				}
+
+				if (movement.getElapsedTime().asSeconds() > 1) {
+					mode = rand() % 3;
+					movement.restart();
+				}
+				if (s1.getPosition().x <= 0 && mode == 1) {
+					s1.move(tc * 7, 0);
+				}
+				if (s1.getPosition().x >= 1184.8 && mode == 0) {
+					s1.move(tc * -7, 0);
+				}
+				if (mode == 2 && fired == 0) {
+					fired = 1;
+					s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
+					shoot.play();
+				}
+				if (fired) {
+					s2.move(0, -10 * bc);
+				}
+
+				if (s2.getPosition().y < 0) {
+					fired = 0;
+					s2.setPosition(800, 800);
+				}
+			}
+		}
 		r1.setSize(Vector2f(b, 20)); r2.setSize(Vector2f(a, 20));//andrew...resize.bars..
 
 		Event event; //to close window
@@ -354,11 +562,193 @@ int main()
 		{
 			if (event.type == Event::Closed)
 				window.close();
+			if (nav == 9) {
+				if (event.type == Event::TextEntered) {
+					usernameSignInTyped.typedOn(event);
+					passwordSignInTyped.typedOn(event);
+				}
+			}
+			if (nav == 10) {
+				if (event.type == Event::TextEntered) {
+					usernameSignUpTyped.typedOn(event);
+					emailSignUpTyped.typedOn(event);
+					passwordSignUpTyped.typedOn(event);
+					confirmPasswordTyped.typedOn(event);
+				}
+			}
 		}
 
 		//bebo
 		Vector2i mousepos = Mouse::getPosition(window);//to get position of mouse relative to window "easier than {Mouse ms;}"
 		//....................main..menu......
+		if (nav == 8)
+		{
+			// change color of login text
+			//sing-in
+			{
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>110 && mousepos.y < 210)
+					color = 1;
+				else 			color = 0;
+
+				if (!color)		mmt[8].setFillColor(Color::White);
+				if (color)		mmt[8].setFillColor(Color::Blue);
+			}
+			//sign_up
+			{
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>310 && mousepos.y < 410)
+					color = 1;
+				else 			color = 0;
+
+				if (!color)		mmt[9].setFillColor(Color::White);
+				if (color)		mmt[9].setFillColor(Color::Blue);
+			}
+		}
+		//navigation in login page
+		if (nav == 8) {
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				//navigate to sign-in
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>110 && mousepos.y < 210)
+					nav = 9;
+				//navigate to sign-up
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>310 && mousepos.y < 410)
+					nav = 10;
+			}
+		}
+		//Sign-in page
+		if (nav == 9) {
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				if (mousepos.x > 300 && mousepos.x < 650 && mousepos.y>110 && mousepos.y < 180)
+					usernameSignInTyped.setSelected(true);
+				else 					usernameSignInTyped.setSelected(false);
+				if (mousepos.x > 300 && mousepos.x < 650 && mousepos.y>260 && mousepos.y < 330)
+					passwordSignInTyped.setSelected(true);
+				else 					passwordSignInTyped.setSelected(false);
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>510 && mousepos.y < 610) {
+					string un, pw;
+					un = usernameSignInTyped.getText();
+					pw = passwordSignInTyped.getText();
+					if (un.empty() == false && pw.empty() == false) {
+						vector<account*> fileLines = download(binFilePath);
+						for (auto line = fileLines.begin(); line != fileLines.end(); line++) {
+							account* acc = *line;
+							if (acc->username == un && acc->password == pw) { 
+								nav = 0;
+								cout << acc->username << endl;
+								cout << acc->email << endl;
+								cout << acc->password << endl;
+								cout << acc->score << endl;
+							}
+							else {
+								invalidBool = true;
+							}
+						}
+					}
+					else {
+						emptyCellBool = true;
+						invalidBool = false;
+					}
+				}
+				if (mousepos.x > 550 && mousepos.x < 770 && mousepos.y>630 && mousepos.y < 710) {
+					if (invalidBool)
+						nav = 10;
+				}
+			}
+			{
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>510 && mousepos.y < 610)
+					color = 1;
+				else 			color = 0;
+
+				if (!color)		mmt[10].setFillColor(Color::White);
+				if (color)		mmt[10].setFillColor(Color::Blue);
+			}
+			{
+				if (mousepos.x > 550 && mousepos.x < 770 && mousepos.y>630 && mousepos.y < 710)
+					color = 1;
+				else 			color = 0;
+
+				if (!color)		mmt[11].setFillColor(Color::White);
+				if (color)		mmt[11].setFillColor(Color::Blue);
+			}
+
+		}
+		if (nav == 10) {
+			string un, em, pw, cpw;
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				if (mousepos.x > 300 && mousepos.x < 650 && mousepos.y>125 && mousepos.y < 180)
+					usernameSignUpTyped.setSelected(true);
+				else 					usernameSignUpTyped.setSelected(false);
+				if (mousepos.x > 200 && mousepos.x < 650 && mousepos.y>225 && mousepos.y < 280)
+					emailSignUpTyped.setSelected(true);
+				else 					emailSignUpTyped.setSelected(false);
+				if (mousepos.x > 250 && mousepos.x < 650 && mousepos.y>325 && mousepos.y < 380)
+					passwordSignUpTyped.setSelected(true);
+				else 					passwordSignUpTyped.setSelected(false);
+				if (mousepos.x > 400 && mousepos.x < 650 && mousepos.y>425 && mousepos.y < 480)
+					confirmPasswordTyped.setSelected(true);
+				else 					confirmPasswordTyped.setSelected(false);
+				un = usernameSignUpTyped.getText();
+				em = emailSignUpTyped.getText();
+				pw = passwordSignUpTyped.getText();
+				cpw = confirmPasswordTyped.getText();
+			}
+			{
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>510 && mousepos.y < 610)
+					color = 1;
+				else 			color = 0;
+
+				if (!color)		mmt[10].setFillColor(Color::White);
+				if (color)		mmt[10].setFillColor(Color::Blue);
+			}
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>510 && mousepos.y < 610) {
+					if (un.empty() == false && em.empty() == false && pw.empty() == false && cpw.empty() == false) {
+						if (cpw == pw) {
+							vector<account*> fileLines = download(binFilePath);
+							for (auto line = fileLines.begin(); line != fileLines.end(); line++) {
+								account* acc = *line;
+								if (acc->username == un) {
+									available = false;
+									break;
+								}
+							}
+							if (available) {
+								accToLoad.username = un;
+								accToLoad.email = em;
+								accToLoad.password = pw;
+								accToLoad.score = 0;
+								load(accToLoad, binFilePath);
+							}
+						}
+						else {
+							pwMatchBool = true;
+							available = true;
+						}
+					}
+					else {
+						emptyCellBool = true;
+						pwMatchBool = false;
+						available = true;
+						emptyCell.setPosition(300, 620);
+					}
+				}
+			}
+		}
+		if (nav == 7) {
+			if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>510 && mousepos.y < 610)
+				color = 1;
+			else 			color = 0;
+
+			if (!color)		mmt[10].setFillColor(Color::White);
+			if (color)		mmt[10].setFillColor(Color::Blue);
+			if (Mouse::isButtonPressed(Mouse::Left)) {
+				if (mousepos.x > 510 && mousepos.x < 790 && mousepos.y>510 && mousepos.y < 610)
+					nav = 0;
+			}
+		}
 		if (nav == 0)
 		{
 			// change color of campaign text
@@ -399,27 +789,42 @@ int main()
 			}
 			// change color of exit text // new vhanged numbers
 			{
-				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>505 && mousepos.y < 545)
+				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>625 && mousepos.y < 655)
+					color = 1;
+				else            color = 0;
+
+				if (!color)		mmt[12].setFillColor(Color::White);
+				if (color)		mmt[12].setFillColor(Color::Blue);
+			}
+			// change color of high score
+			{
+				if (mousepos.x > 50 && mousepos.x < 270 && mousepos.y>505 && mousepos.y < 545)
 					color = 1;
 				else            color = 0;
 
 				if (!color)		mmt[7].setFillColor(Color::White);
 				if (color)		mmt[7].setFillColor(Color::Blue);
 			}
-
-
 			//################# Navigation from main menu ##################
 			if (Mouse::isButtonPressed(Mouse::Left))
 			{
-				if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80)   nav = 1; // to campaign "click on campaign"
+				if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80) {
+					movement.restart(); nav = 1;
+				} // to campaign "click on campaign"
 				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>145 && mousepos.y < 184) {
 					nav = 2;
+					setter();
+					s1.setPosition(20, 600);
+					s2.setPosition(800, 720);
+					h = 100;
+					a = 250;
 					survt.restart();
 				}// to survival "click on survival"
 				if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424) nav = 3; // from main menu to credits
 				if (mousepos.x > 43 && mousepos.x < 274 && mousepos.y>265 && mousepos.y < 315) nav = 21; // from main menu to how to play "movement"
 
-				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>505 && mousepos.y < 545) window.close(); //exit from main menu "click on exit"
+				if (mousepos.x > 50 && mousepos.x < 270 && mousepos.y>505 && mousepos.y < 545) nav = 7; //display high score
+				if (mousepos.x > 100 && mousepos.x < 190 && mousepos.y>625 && mousepos.y < 655) window.close(); //exit from main menu "click on exit"
 			}
 		}
 		//.................campaign..mode..menu......
@@ -427,38 +832,41 @@ int main()
 		{
 			// change color of scorched earth text
 			{
-				if (mousepos.x > 67 && mousepos.x < 393 && mousepos.y>78 && mousepos.y < 120)
+				if (mousepos.y > 0 && mousepos.y < 250)
 					color = 1;
 				else 			color = 0;
 
-				if (!color)		mmt[0].setFillColor(Color::White);
-				if (color)		mmt[0].setFillColor(Color::Blue);
+				if (!color)		lvlcolored[0].setPosition(1600, 0);
+				if (color)		lvlcolored[0].setPosition(0, 0);
 			}
 			// change color of ashes to ashes text
 			{
-				if (mousepos.x > 67 && mousepos.x < 390 && mousepos.y>278 && mousepos.y < 320)
+				if (mousepos.y > 250 && mousepos.y < 470 && passed[0])
 					color = 1;
 				else 			color = 0;
 
-				if (!color)		mmt[1].setFillColor(Color::White);
-				if (color)		mmt[1].setFillColor(Color::Blue);
+				if (!color)		lvlcolored[1].setPosition(1600, 0);
+				if (color)		lvlcolored[1].setPosition(0, 250);
 			}
 			// change color of end of the line text
 			{
-				if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520)
+				if (mousepos.y > 470 && mousepos.y < 750 && passed[1])
 					color = 1;
 				else            color = 0;
 
-				if (!color)		mmt[2].setFillColor(Color::White);
-				if (color)		mmt[2].setFillColor(Color::Blue);
+				if (!color)		lvlcolored[2].setPosition(1600, 0);
+				if (color)		lvlcolored[2].setPosition(0, 470);
+
 			}
 			//################# Navigation in campaign ##################
-			if (Mouse::isButtonPressed(Mouse::Left))
-			{
-				if (mousepos.x > 67 && mousepos.x < 393 && mousepos.y>78 && mousepos.y < 120) nav = 11;//play scorched earth  "1st level"
-				if (mousepos.x > 67 && mousepos.x < 390 && mousepos.y>278 && mousepos.y < 320)nav = 12;//play ashes to ashes  "2nd level"
-				if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520)nav = 13;//play end of the line "3rd level"
-			}
+			if (movement.getElapsedTime().asSeconds() > 0.5)
+				if (Mouse::isButtonPressed(Mouse::Left))
+				{
+
+					if (mousepos.y > 0 && mousepos.y < 250) { nav = 11; setter(); h = 100; a = 250; }//play scorched earth  "1st level"
+					if (mousepos.y > 250 && mousepos.y < 470 && passed[0]) { nav = 12; setter(); }//play ashes to ashes  "2nd level"
+					if (mousepos.y > 470 && mousepos.y < 720 && passed[1]) { nav = 13; setter(); }//play end of the line "3rd level"
+				}
 		}
 		//...................How to Play...........
 		if (nav == 21 || nav == 22 || nav == 23)
@@ -482,6 +890,7 @@ int main()
 			if (s >= reqscore)
 			{
 				bound = 0;
+				pass = 1;
 				setter();
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
@@ -489,7 +898,6 @@ int main()
 				bound = 1;
 				s1.setPosition(20, 600);
 				s = 0;
-				score.setString(to_string(s));
 				nav = 12;
 			}
 		}
@@ -498,6 +906,8 @@ int main()
 			reqscore = 250;
 			if (s >= reqscore)
 			{
+				pass = 2;
+
 				bound = 0;
 				setter();
 			}
@@ -506,7 +916,7 @@ int main()
 				bound = 1;
 				s1.setPosition(20, 600);
 				s = 0;
-				score.setString(to_string(s));
+
 				nav = 13;
 			}
 		}
@@ -523,13 +933,14 @@ int main()
 				bound = 1;
 				s1.setPosition(20, 600);
 				s = 0;
-				score.setString(to_string(s));
+
 			}
 		}
 		//#################################################
 
 		//.................game.....
-		if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
+
+		if (nav == 2 || nav == 11 || nav == 12 || nav == 13 || nav == 0 || nav == 1) {
 			//hamed
 			//######################## Movement ###############################
 				//1-tank
@@ -612,12 +1023,10 @@ int main()
 					if (shon)
 					{
 						shi -= 10;
-						sheild.setString(to_string(shi));
 						b -= 25;
 					}
 					else {
 						h -= 10;
-						health.setString(to_string(h));
 						a -= 25;
 					}
 					explosion.play();
@@ -630,20 +1039,16 @@ int main()
 					if (shon && shi < 30) {
 						h -= 30 - shi;
 						a -= 75 - b;
-						health.setString(to_string(h));
 						shi = 0;
-						sheild.setString(to_string(shi));
 						b = 0;
 					}
 					else if (shon)
 					{
 						shi -= 30;
-						sheild.setString(to_string(shi));
 						b -= 75;
 					}
 					else {
 						h -= 30;
-						health.setString(to_string(h));
 						a -= 75;
 					}
 					explosion.play();
@@ -655,7 +1060,6 @@ int main()
 					sh[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					if (h < 100)
 						h += 10;
-					health.setString(to_string(h));
 					if (a < 250)
 						a += 25;
 				}
@@ -666,7 +1070,6 @@ int main()
 				shi += 50;
 				if (shi > 100)
 					shi = 100;
-				sheild.setString(to_string(shi));
 				b += 125;
 				if (b > 250)
 					b = 250;
@@ -680,7 +1083,6 @@ int main()
 					exp2[i].setPosition(b2[i].getPosition().x - 100, b2[i].getPosition().y - 65);
 					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					s += 10;
-					score.setString(to_string(s));
 					fired = 0;
 					s2.setPosition(800, 800);
 					collided2[i] = 1;
@@ -695,7 +1097,6 @@ int main()
 					exp1[i].setPosition(b1[i].getPosition().x - 50, b1[i].getPosition().y - 30);
 					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					s += 10;
-					score.setString(to_string(s));
 					fired = 0;
 					s2.setPosition(800, 800);
 					explosion.play();
@@ -775,6 +1176,9 @@ int main()
 			}
 			//#################################################
 
+		}
+		if (nav == 0 || nav == 1) {
+			gbg.setTexture(tg);
 		}
 		//.................survival..mode.......
 		if (nav == 2) {
@@ -861,7 +1265,7 @@ int main()
 		{	//new added numbers
 			if (nav == 1 || nav == 3 || nav == 4 || nav == 21 || nav == 22 || nav == 23)nav = 0;// go from campaign menu to main menu // new added credits and how to play and highscores
 			if (nav == 2 || nav == 11 || nav == 12 || nav == 13)  pause = 1; //pause the game
-			if (nav == 32 || nav == 31) { music.stop(); main(); } // play again
+			if (nav == 32 || nav == 31) { music.pause(); main(); } // play again
 
 		}
 		// new pause menu loop
@@ -928,24 +1332,96 @@ int main()
 		window.clear();
 		//faisl
 		//main menu
+		window.draw(gbg);
+		//draw the login page
+		if (nav == 8) {
+			window.draw(login);
+			for (int i = 8; i < 10; i++) {
+				window.draw(textCover[i]);
+				window.draw(mmt[i]);
+			}
+		}
+		//draw the sign-in page
+		if (nav == 9) {
+			window.draw(login);
+			window.draw(usernameSignIn);
+			window.draw(passwordSignIn);
+			usernameSignInTyped.setPosition({ 350, 120 });
+			usernameSignInTyped.drawTo(window);
+			passwordSignInTyped.setPosition({350, 270});
+			passwordSignInTyped.drawTo(window);
+			window.draw(textCover[10]);
+			window.draw(mmt[10]);
+			if (invalidBool) {
+				emptyCellBool = false;
+				window.draw(invalid);
+				window.draw(textCover[11]);
+				window.draw(mmt[11]);
+			}
+			if (emptyCellBool) {
+				window.draw(emptyCell);
+			}
+		}
+		if (nav == 10) {
+			window.draw(login);
+			usernameSignIn.setPosition(100, 100);
+			passwordSignIn.setPosition(100, 300);
+			window.draw(usernameSignIn);
+			window.draw(emailSignUp);
+			window.draw(passwordSignIn);
+			window.draw(confirmPassword);
+			usernameSignUpTyped.setPosition({ 350, 120 });
+			usernameSignUpTyped.drawTo(window);
+			emailSignUpTyped.setPosition({ 250, 220 });
+			emailSignUpTyped.drawTo(window);
+			passwordSignUpTyped.setPosition({ 350, 320 });
+			passwordSignUpTyped.drawTo(window);
+			confirmPasswordTyped.setPosition({ 500, 420 });
+			confirmPasswordTyped.drawTo(window);
+			window.draw(textCover[10]);
+			window.draw(mmt[10]);
+			if (pwMatchBool) {
+				emptyCellBool = false;
+				window.draw(pwMatch);
+			}
+			if (emptyCellBool) {
+				window.draw(emptyCell);
+			}
+			if (!available) {
+				window.draw(ava);
+			}
+		}
+		if (nav == 7) {
+			window.draw(login);
+			window.draw(highscore);
+			hScore.setString(to_string(accToGet.score));
+			window.draw(hScore);
+			window.draw(textCover[10]);
+			window.draw(mmt[10]);
+		}
 		if (nav == 0) // main menu
 		{
-			window.draw(ibg);
+
 			for (int i = 3; i < 8; i++) // new changed numbers
 			{
 				window.draw(textCover[i]);
 				window.draw(mmt[i]);
 			}
+			window.draw(textCover[12]);
+			window.draw(mmt[12]);
 
 		}
 		if (nav == 1) // campaign menu
 		{
-			window.draw(ibg);
+
 			for (int i = 0; i < 3; i++)
 			{
-				window.draw(textCover[i]);
+				window.draw(lvlbw[i]);
+				window.draw(lvlcolored[i]);
 				window.draw(mmt[i]);
+
 			}
+
 		}
 		if (nav == 3) //credits
 		{
@@ -992,9 +1468,9 @@ int main()
 		//#################################################
 
 		//####### game  #######
-		if (nav == 2 || nav == 11 || nav == 12 || nav == 13)
+		if (nav == 2 || nav == 11 || nav == 12 || nav == 13 || nav == 0)
 		{
-			window.draw(gbg);
+
 			//hamed
 			window.draw(s1);
 			window.draw(s2);
@@ -1017,10 +1493,12 @@ int main()
 				window.draw(ss);//sheild
 				//#################################################
 				//andrew
-				window.draw(r1);// sheild bar
-				window.draw(r2);// health bar
-				// text for score health sheild
-				window.draw(score);	window.draw(health);
+				if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
+					window.draw(r1);// sheild bar
+					window.draw(r2);// health bar
+					// text for score health sheild
+					window.draw(score);	window.draw(health);
+				}
 				if (shon)
 					window.draw(sheild);
 				//#################################################
@@ -1078,4 +1556,3 @@ int main()
 	}
 	return 0;
 }
-
