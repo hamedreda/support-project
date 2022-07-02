@@ -2,41 +2,29 @@
 #include <SFML/Audio.hpp>;
 using namespace sf;
 using namespace std;
+int h = 100, shi = 0, s = 0, a = 250, b = 0, pass = 0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE ,HEALTH,SHEILD BAR
+bool passed[2] = {};
 
 // tebo
 Sprite b1[10], b2[5], sh[3], ss;// spr arr FOR BOMBS& SHIELD,apple
 void setter() {
-	//bomb1
-	for (int i = 0; i < 10; i++)
-	{
-		b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
-	}
-	//nuke
-	for (int i = 0; i < 5; i++)
-	{
-		b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
-	}
-	//apple
-	for (int i = 0; i < 3; i++)
-	{
-		sh[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1));
-	}
-	//SHIELD
-	ss.setPosition(rand() % 1200, -5040);
+	for (int i = 0; i < 10; i++) { b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); }//bomb
+	for (int i = 0; i < 5; i++) { b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //nuke
+	for (int i = 0; i < 3; i++) { sh[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //SHIELD 
+	ss.setPosition(rand() % 1200, -5040); shi = 0; s = 0; b = 0;//apple 
 }
-//#################################################
+Music music;
+//################################################# 
 RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
 int main()
 {
-	window.setFramerateLimit(40); //fps
-
-	//andrew
-	int a = 250, b = 0; //for HEALTH,SHEILD BAR
-	int h = 100, shi = 0, s = 0; //VARIABLES FOR HEALTH ,SHEILD ,SCORE 
+	Font f; f.loadFromFile("font.ttf"); //FONT
+	window.setFramerateLimit(40); //fps //random movement in the background 
+	bool random = 1, begin = 0, paint[4] = {}; int mode = 0; Clock movement; //andrew
 	bool shon = 0; //bool for sheild
-	RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR
-	RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1005, 15); r2.setFillColor(Color::Red); //HEALTH BAR
-	//#################################################
+	
+	RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR 
+	RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1005, 15); r2.setFillColor(Color::Red); //HEALTH BAR //#################################################
 
 	int nav = 0; bool pause = 0;//bebo....navigation and pause game
 
@@ -44,9 +32,12 @@ int main()
 	//hamed
 	int reqscore = 200;
 	int tc = 1, bc = 1; //speed const.(boosters)
-	Clock tbc, bbc; // clock for boosters
+	Clock tbc, bbc, celebration; // clock for boosters
 	bool fired = 0, tbb = 0, bbb = 0; //bools for bullet,boosters
 	Clock survt; int reqtime = 25, speed = 0; //survival time&speed
+	Clock timegap;	int timeg = 0, yarab = 0;
+
+	Text survtt;	survtt.setFont(f); survtt.setCharacterSize(50);	survtt.setPosition(300, -5);
 	int survcnt = 0;
 	//#################################################
 
@@ -71,7 +62,6 @@ int main()
 	}
 	//#################################################
 
-	Font f; f.loadFromFile("font.ttf"); //FONT
 
 	//andrew
 							// TEXT FOR SCORE & HEALTH & SHEILD :
@@ -125,7 +115,7 @@ int main()
 	{
 		sh[i].setTexture(t5);
 		sh[i].setPosition(rand() % 1200, -1440 * (i + 1));
-		sh[i].setScale(0.1, 0.1);
+		sh[i].setScale(0.25, 0.25);
 	}
 	//sheild
 	ss.setTexture(t3);
@@ -142,6 +132,7 @@ int main()
 	tbi.setScale(0.01, 0.01);	bbi.setScale(0.025, 0.025);
 	//#################################################
 
+
 	//faisl
 
 		// 4- game's starting & ending txt + intro & game bg 
@@ -155,29 +146,56 @@ int main()
 	ending.loadFromFile("endgame.ttf");
 	Font moving;
 	moving.loadFromFile("chunk.otf");
-	Text endgame[4];  Text movegame;	Text backToMain;
+	Text endgame[4];	Text backToMain;
 	for (int i = 0; i < 4; i++) {
 		endgame[i].setFont(ending);
 		endgame[i].setCharacterSize(65);
 		endgame[i].setPosition(300, 200);
-		endgame[i].setFillColor(sf::Color::Red);
+		endgame[i].setFillColor(sf::Color::White);
 	}
 	endgame[0].setString("Well done soldier");
 	endgame[1].setString("Mission failed succesfully");
-	endgame[2].setPosition(300, 300);
-	endgame[3].setPosition(300, 400);
-	movegame.setFont(moving);
-	movegame.setCharacterSize(57);
-	movegame.setPosition(85, -10);
-	movegame.setFillColor(sf::Color::Blue);
-	movegame.setString("Move to the right & Press enter");
+	endgame[2].setPosition(300, 100);
+	endgame[3].setPosition(300, 200);
 	backToMain.setFont(ending);
 	backToMain.setCharacterSize(50);
-	backToMain.setFillColor(Color::Red);
+	backToMain.setFillColor(Color::White);
 	backToMain.setString("press Esc to go back to Main Menu");
-	backToMain.setPosition(300, 500);
+	backToMain.setPosition(300, 430);
 
-	// 5-  the cover that holds the text inside it 
+	// 5-  the cover that holds the text inside it & lvl photos
+	Texture bw[3], colored[3], phases1[4], phases2[4];
+	bw[0].loadFromFile("lvl1bw.jpeg");
+	bw[1].loadFromFile("lvl2bw.jpeg");
+	bw[2].loadFromFile("lvl3bw.jpeg");
+	colored[0].loadFromFile("lvl1colored.jpeg");
+	colored[1].loadFromFile("lvl2colored.jpeg");
+	colored[2].loadFromFile("lvl3colored.jpeg");
+	phases1[0].loadFromFile("phase0.jpeg");
+	phases1[1].loadFromFile("phase1.jpeg");
+	phases1[2].loadFromFile("phase2.jpeg");
+	phases1[3].loadFromFile("phase3.jpeg");
+	phases2[0].loadFromFile("phases0.jpeg");
+	phases2[1].loadFromFile("phases1.jpeg");
+	phases2[2].loadFromFile("phases2.jpeg");
+	phases2[3].loadFromFile("phases3.jpeg");
+
+	Sprite lvlbw[3], lvlcolored[3], phase1[4], phase2[4];
+	for (int i = 0; i < 3; i++) {
+		lvlbw[i].setTexture(bw[i]);
+		lvlcolored[i].setTexture(colored[i]);
+	}
+	for (int i = 0; i < 4; i++) {
+		phase1[i].setTexture(phases1[i]);
+		phase1[i].setPosition(325, 75);
+		phase1[i].setScale(0.5, 0.5);
+		phase2[i].setTexture(phases2[i]);
+		phase2[i].setPosition(325, 75);
+		phase2[i].setScale(0.5, 0.5);
+	}
+
+
+
 	Texture textcover;
 	textcover.loadFromFile("TextCover.png");
 	Sprite textCover[8];
@@ -199,9 +217,13 @@ int main()
 		textCover[i].setScale(2, 2);
 		textCover[i].setTexture(textcover);
 	}
-	textCover[0].setPosition(0, 0);
-	textCover[1].setPosition(0, 200);
-	textCover[2].setPosition(0, 400);
+	lvlbw[0].setPosition(0, 0);
+	lvlbw[1].setPosition(0, 250);
+	lvlbw[2].setPosition(0, 470);
+	lvlcolored[0].setPosition(1600, 0);
+	lvlcolored[1].setPosition(1600, 250);
+	lvlcolored[2].setPosition(1600, 470);
+
 
 	//############ main menu text ############
 	Font font;		  Text mmt[8];		bool color = 0;
@@ -260,7 +282,7 @@ int main()
 	HowtoPlay[0].setScale(0.2, 0.2);		HowtoPlay[0].setPosition(5, 180);
 	HowtoPlay[1].setScale(0.2, 0.2);		HowtoPlay[1].setPosition(65, 180);
 	HowtoPlay[2].setScale(0.7, 0.2);		HowtoPlay[2].setPosition(5, 340);
-	HowtoPlay[3].setScale(0.14, 0.14);		HowtoPlay[3].setPosition(40, 100);
+	HowtoPlay[3].setScale(0.4, 0.4);		HowtoPlay[3].setPosition(40, 100);
 	HowtoPlay[4].setScale(0.04, 0.04);		HowtoPlay[4].setPosition(30, 220);
 	HowtoPlay[5].setScale(0.03, 0.03);		HowtoPlay[5].setPosition(25, 335);
 	HowtoPlay[6].setScale(0.06, 0.06);		HowtoPlay[6].setPosition(40, 460);
@@ -303,26 +325,46 @@ int main()
 		htp23[i].setStyle(Text::Bold);
 	}
 	htp23[0].setString("Pickups");		htp23[0].setCharacterSize(80);		htp23[0].setPosition(520, 0);	htp23[0].setFillColor(Color::Blue);
-	htp23[1].setString("apple : regenerates health");						htp23[1].setPosition(169, 100);
+	htp23[1].setString("ScrewDriver : fixes the tank");					htp23[1].setPosition(169, 100);
 	htp23[2].setString("armor : puts shield on tank");						htp23[2].setPosition(169, 220);
 	htp23[3].setString("accelrator : increase tank velocity");				htp23[3].setPosition(169, 340);
 	htp23[4].setString("thunder : increase bullet velocity");				htp23[4].setPosition(169, 460);
-	htp23[5].setString("bomb : does 10 damage");							htp23[5].setPosition(150, 580);
+	htp23[5].setString("bomb : does 5 damage");								htp23[5].setPosition(150, 580);
 	htp23[6].setString("nuke : does 30 damage");							htp23[6].setPosition(789, 580);
 
 	//#################################################
 
 	//bebo
-	//pause menu text
-	Text pmt[2];
-	for (int i = 0; i < 2; i++)
+	//pause menu  ^^^^
+	Text pmt[3], options[3];//^^^^ added options array and pmt increased
+	for (int i = 0; i < 3; i++)
 	{
 		pmt[i].setFont(font);
 		pmt[i].setCharacterSize(48);
 		pmt[i].setStyle(Text::Bold);
+		options[i].setFont(font);
+		options[i].setCharacterSize(48);
+		options[i].setStyle(Text::Bold);
 	}
 	pmt[0].setString("Resume");		pmt[0].setPosition(0, 0);
-	pmt[1].setString("Main Menu");	pmt[1].setPosition(0, 150);
+	pmt[1].setString("Main Menu");	pmt[1].setPosition(0, 180);
+	pmt[2].setString("Options");	pmt[2].setPosition(0, 90);//^^^^
+	//^^^^
+	options[0].setString("Music");		options[0].setPosition(10, 10);
+	options[1].setString("Sound FX");	options[1].setPosition(10, 90);
+	options[2].setString("press ESC to go back");	options[2].setPosition(0, 200);	options[2].setCharacterSize(30);
+	Texture box, check; box.loadFromFile("empty-box1.png"); check.loadFromFile("check-mark.png");
+	Sprite BOX1, BOX2, CHECK1, CHECK2;
+	BOX1.setPosition(260, 10);	 BOX1.setScale(1, 1);		BOX1.setTexture(box);
+	BOX2.setPosition(260, 90);	 BOX2.setScale(1, 1);		BOX2.setTexture(box);
+	CHECK1.setPosition(265, 15);	 CHECK1.setScale(0.7, 0.7);	CHECK1.setTexture(check);
+	CHECK2.setPosition(265, 95); CHECK2.setScale(0.7, 0.7);	CHECK2.setTexture(check);
+
+	Texture pausemenu; pausemenu.loadFromFile("camo.jpg");
+	Sprite PauseMenuBG; PauseMenuBG.setTexture(pausemenu);
+	bool optsound = 1, optmusic = 1, optionsB = 0;
+	Clock opt;
+
 	//#################################################
 
 	// haitham
@@ -337,16 +379,104 @@ int main()
 	music1.loadFromFile("explosion.wav");
 	Sound explosion;
 	explosion.setBuffer(music1);
+	//celebration
+	SoundBuffer win;
+	win.loadFromFile("victory.wav");
+	Sound victory;
+	victory.setBuffer(win);
 	//game
-	Music music;
+
 	music.openFromFile("Game audio1.wav");
 	music.setLoop("Game audio1.wav");
-	music.play();
-	//#################################################
 
+	//#################################################
+	////arrowww
+	Sprite arrow;
+	Texture arrw;
+	int zz = 0;
+	arrw.loadFromFile("right arrow.png");
+	arrow.setTexture(arrw);
+	arrow.setTextureRect(IntRect(0, 0, 200, 188));
+	arrow.setPosition(1100, 0);
+	arrow.setScale(0.7, 0.7);
+	bool levelup = 0;
+	Clock arrowcnt;
+	//########################################################
+	//damage counter
+	int dmgt = 0, bombcnt = 0, nukecnt = 0;
+	//text for stats
+	Text bombn, nuken, dmg;
+	bombn.setFont(ending);
+	bombn.setString("Number of bombs destroyed:" + to_string(bombcnt));
+	bombn.setFillColor(Color::White);
+	bombn.setPosition(300, 550);
+	nuken.setFont(ending);
+	nuken.setString("Number of nukes destroyed: " + to_string(nukecnt));
+	nuken.setFillColor(Color::White);
+	nuken.setPosition(300, 600);
+	dmg.setFont(ending);
+	dmg.setString("Damage taken: " + to_string(dmgt));
+	dmg.setFillColor(Color::White);
+	dmg.setPosition(300, 650);
+	if (optmusic) music.play();//^^^^
+	else music.pause();
 	while (window.isOpen())
 	{
+		
+		if (pass == 1)
+			passed[0] = 1;
+		if (pass == 2)
+			passed[1] = 1;
+		if (nav == 1) {
+			a = 250, b = 0;
+			h = 100, shi = 0, s = 0;
+		}
+		sheild.setString(to_string(shi));
+		score.setString(to_string(s));
+		health.setString(to_string(h));
+		if (Keyboard::isKeyPressed(Keyboard::Right) || Keyboard::isKeyPressed(Keyboard::Left) || Keyboard::isKeyPressed(Keyboard::Space)) {
+			random = 0;
+			movement.restart();
 
+		}
+		if (movement.getElapsedTime().asSeconds() > 10) {
+			random = 1;
+		}
+		if (nav == 0) {
+			if (random) {
+				//bool random int mode clock movemnt
+				if (mode == 0) {
+					s1.move(7, 0);
+				}
+				if (mode == 1) {
+					s1.move(-7, 0);
+				}
+
+				if (movement.getElapsedTime().asSeconds() > 1) {
+					mode = rand() % 3;
+					movement.restart();
+				}
+				if (s1.getPosition().x <= 0 && mode == 1) {
+					s1.move(tc * 7, 0);
+				}
+				if (s1.getPosition().x >= 1184.8 && mode == 0) {
+					s1.move(tc * -7, 0);
+				}
+				if (mode == 2 && fired == 0) {
+					fired = 1;
+					s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
+					if (optsound)shoot.play();
+				}
+				if (fired) {
+					s2.move(0, -10 * bc);
+				}
+
+				if (s2.getPosition().y < 0) {
+					fired = 0;
+					s2.setPosition(800, 800);
+				}
+			}
+		}
 		r1.setSize(Vector2f(b, 20)); r2.setSize(Vector2f(a, 20));//andrew...resize.bars..
 
 		Event event; //to close window
@@ -411,9 +541,16 @@ int main()
 			//################# Navigation from main menu ##################
 			if (Mouse::isButtonPressed(Mouse::Left))
 			{
-				if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80)   nav = 1; // to campaign "click on campaign"
+				if (mousepos.x > 45 && mousepos.x < 280 && mousepos.y > 25 && mousepos.y < 80) {
+					movement.restart(); nav = 1;
+				} // to campaign "click on campaign"
 				if (mousepos.x > 67 && mousepos.x < 237 && mousepos.y>145 && mousepos.y < 184) {
 					nav = 2;
+					setter();
+					s1.setPosition(20, 600);
+					s2.setPosition(800, 720);
+					h = 100;
+					a = 250;
 					survt.restart();
 				}// to survival "click on survival"
 				if (mousepos.x > 80 && mousepos.x < 231 && mousepos.y>385 && mousepos.y < 424) nav = 3; // from main menu to credits
@@ -427,38 +564,41 @@ int main()
 		{
 			// change color of scorched earth text
 			{
-				if (mousepos.x > 67 && mousepos.x < 393 && mousepos.y>78 && mousepos.y < 120)
+				if (mousepos.y > 0 && mousepos.y < 250)
 					color = 1;
 				else 			color = 0;
 
-				if (!color)		mmt[0].setFillColor(Color::White);
-				if (color)		mmt[0].setFillColor(Color::Blue);
+				if (!color)		lvlcolored[0].setPosition(1600, 0);
+				if (color)		lvlcolored[0].setPosition(0, 0);
 			}
 			// change color of ashes to ashes text
 			{
-				if (mousepos.x > 67 && mousepos.x < 390 && mousepos.y>278 && mousepos.y < 320)
+				if (mousepos.y > 250 && mousepos.y < 470 && passed[0])
 					color = 1;
 				else 			color = 0;
 
-				if (!color)		mmt[1].setFillColor(Color::White);
-				if (color)		mmt[1].setFillColor(Color::Blue);
+				if (!color)		lvlcolored[1].setPosition(1600, 0);
+				if (color)		lvlcolored[1].setPosition(0, 250);
 			}
 			// change color of end of the line text
 			{
-				if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520)
+				if (mousepos.y > 470 && mousepos.y < 750 && passed[1])
 					color = 1;
 				else            color = 0;
 
-				if (!color)		mmt[2].setFillColor(Color::White);
-				if (color)		mmt[2].setFillColor(Color::Blue);
+				if (!color)		lvlcolored[2].setPosition(1600, 0);
+				if (color)		lvlcolored[2].setPosition(0, 470);
+
 			}
 			//################# Navigation in campaign ##################
-			if (Mouse::isButtonPressed(Mouse::Left))
-			{
-				if (mousepos.x > 67 && mousepos.x < 393 && mousepos.y>78 && mousepos.y < 120) nav = 11;//play scorched earth  "1st level"
-				if (mousepos.x > 67 && mousepos.x < 390 && mousepos.y>278 && mousepos.y < 320)nav = 12;//play ashes to ashes  "2nd level"
-				if (mousepos.x > 67 && mousepos.x < 407 && mousepos.y>478 && mousepos.y < 520)nav = 13;//play end of the line "3rd level"
-			}
+			if (movement.getElapsedTime().asSeconds() > 0.5)
+				if (Mouse::isButtonPressed(Mouse::Left))
+				{
+
+					if (mousepos.y > 0 && mousepos.y < 250) { nav = 11; setter(); h = 100; a = 250; }//play scorched earth  "1st level"
+					if (mousepos.y > 250 && mousepos.y < 470 && passed[0]) { nav = 12; setter(); }//play ashes to ashes  "2nd level"
+					if (mousepos.y > 470 && mousepos.y < 720 && passed[1]) { nav = 13; setter(); }//play end of the line "3rd level"
+				}
 		}
 		//...................How to Play...........
 		if (nav == 21 || nav == 22 || nav == 23)
@@ -482,33 +622,103 @@ int main()
 			if (s >= reqscore)
 			{
 				bound = 0;
+				pass = 1;
 				setter();
+				levelup = 1;
+				begin = 1;
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
+			if (begin) {
+				celebration.restart();
+				if (optsound)victory.play();
+				music.stop();
+				begin = 0;
+			}
+			if (s1.getPosition().x >= 1280)
 			{
 				bound = 1;
 				s1.setPosition(20, 600);
+				if (optmusic)music.play();
 				s = 0;
-				score.setString(to_string(s));
 				nav = 12;
+				levelup = 0;
 			}
+			if (celebration.getElapsedTime().asSeconds() < 0.5) {
+				paint[0] = 1;
+			}
+			else {
+				paint[0] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 0.5 && celebration.getElapsedTime().asSeconds() < 1) {
+				paint[1] = 1;
+			}
+			else {
+				paint[1] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 1 && celebration.getElapsedTime().asSeconds() < 1.5) {
+				paint[2] = 1;
+			}
+			else {
+				paint[2] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 1.5) {
+				paint[3] == 1;
+			}
+			else {
+				paint[3] == 0;
+			}
+
 		}
 		if (nav == 12) {
 			gbg.setTexture(lvl2);
 			reqscore = 250;
 			if (s >= reqscore)
 			{
+				pass = 2;
+				levelup = 1;
 				bound = 0;
 				setter();
+				begin = 1;
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
+			if (begin) {
+				celebration.restart();
+				if (optsound)victory.play();
+				if (optmusic)music.stop();
+				begin = 0;
+			}
+			if (s1.getPosition().x >= 1280)
 			{
 				bound = 1;
 				s1.setPosition(20, 600);
+				if (optmusic)music.play();
 				s = 0;
-				score.setString(to_string(s));
 				nav = 13;
+				levelup = 0;
 			}
+			if (celebration.getElapsedTime().asSeconds() < 0.5) {
+				paint[0] = 1;
+			}
+			else {
+				paint[0] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 0.5 && celebration.getElapsedTime().asSeconds() < 1) {
+				paint[1] = 1;
+			}
+			else {
+				paint[1] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 1 && celebration.getElapsedTime().asSeconds() < 1.5) {
+				paint[2] = 1;
+			}
+			else {
+				paint[2] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 1.5) {
+				paint[3] == 1;
+			}
+			else {
+				paint[3] == 0;
+			}
+
 		}
 		if (nav == 13)
 		{
@@ -523,13 +733,14 @@ int main()
 				bound = 1;
 				s1.setPosition(20, 600);
 				s = 0;
-				score.setString(to_string(s));
+
 			}
 		}
 		//#################################################
 
 		//.................game.....
-		if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
+
+		if (nav == 2 || nav == 11 || nav == 12 || nav == 13 || nav == 0 || nav == 1) {
 			//hamed
 			//######################## Movement ###############################
 				//1-tank
@@ -545,7 +756,7 @@ int main()
 				if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
 					fired = 1;
 					s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
-					shoot.play();
+					if (optsound)shoot.play();
 				}
 				//repeats bullets's movement
 				if (fired) {
@@ -609,44 +820,40 @@ int main()
 			for (int i = 0; i < 10; i++) {
 				if (s1.getGlobalBounds().intersects(b1[i].getGlobalBounds())) {
 					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					dmgt += 10;
 					if (shon)
 					{
 						shi -= 10;
-						sheild.setString(to_string(shi));
 						b -= 25;
 					}
 					else {
 						h -= 10;
-						health.setString(to_string(h));
 						a -= 25;
 					}
-					explosion.play();
+					if (optsound)explosion.play();
 				}
 			}
 			//nuke with tank
 			for (int i = 0; i < 5; i++) {
 				if (s1.getGlobalBounds().intersects(b2[i].getGlobalBounds())) {
 					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
+					dmgt += 30;
 					if (shon && shi < 30) {
 						h -= 30 - shi;
 						a -= 75 - b;
-						health.setString(to_string(h));
 						shi = 0;
-						sheild.setString(to_string(shi));
 						b = 0;
 					}
 					else if (shon)
 					{
 						shi -= 30;
-						sheild.setString(to_string(shi));
 						b -= 75;
 					}
 					else {
 						h -= 30;
-						health.setString(to_string(h));
 						a -= 75;
 					}
-					explosion.play();
+					if (optsound)explosion.play();
 				}
 			}
 			//apple with the tank
@@ -655,22 +862,23 @@ int main()
 					sh[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					if (h < 100)
 						h += 10;
-					health.setString(to_string(h));
 					if (a < 250)
 						a += 25;
 				}
 			}
 			//shield with the tank
-			if (s1.getGlobalBounds().intersects(ss.getGlobalBounds())) {
-				ss.setPosition(rand() % 1200, -5040);
-				shi += 50;
-				if (shi > 100)
-					shi = 100;
-				sheild.setString(to_string(shi));
-				b += 125;
-				if (b > 250)
-					b = 250;
-				shon = 1;
+			if (nav == 2) {
+				if (s1.getGlobalBounds().intersects(ss.getGlobalBounds())) {
+					ss.setPosition(rand() % 1200, -5040);
+					shi += 50;
+					if (shi > 100)
+						shi = 100;
+					b += 125;
+					if (b > 250)
+						b = 250;
+					shon = 1;
+				}
+
 			}
 
 			//bullet with nukes
@@ -680,11 +888,11 @@ int main()
 					exp2[i].setPosition(b2[i].getPosition().x - 100, b2[i].getPosition().y - 65);
 					b2[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
 					s += 10;
-					score.setString(to_string(s));
 					fired = 0;
 					s2.setPosition(800, 800);
 					collided2[i] = 1;
-					explosion.play();
+					if (optsound)explosion.play();
+					nukecnt++;
 				}
 			}
 			//bullets with bombs
@@ -694,11 +902,11 @@ int main()
 					//animation1[i].restart();
 					exp1[i].setPosition(b1[i].getPosition().x - 50, b1[i].getPosition().y - 30);
 					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					s += 10;
-					score.setString(to_string(s));
+					s += 5;
 					fired = 0;
 					s2.setPosition(800, 800);
-					explosion.play();
+					if (optsound)explosion.play();
+					bombcnt++;
 				}
 			}
 
@@ -709,7 +917,7 @@ int main()
 					sh[i].setPosition(rand() % 1200, -3600);
 					fired = 0;
 					s2.setPosition(1800, 800);
-					explosion.play();
+					if (optsound)explosion.play();
 				}
 			}
 			//bullets with shields
@@ -717,7 +925,7 @@ int main()
 				ss.setPosition(rand() % 1200, -5040);
 				fired = 0;
 				s2.setPosition(1800, 800);
-				explosion.play();
+				if (optsound)explosion.play();
 			}
 			//#################################################
 
@@ -776,6 +984,9 @@ int main()
 			//#################################################
 
 		}
+		if (nav == 0 || nav == 1) {
+			gbg.setTexture(tg);
+		}
 		//.................survival..mode.......
 		if (nav == 2) {
 			gbg.setTexture(tg);
@@ -811,14 +1022,14 @@ int main()
 				tb.setPosition(rand() % 1200, -6480);
 				fired = 0;
 				s2.setPosition(1800, 800);
-				explosion.play();
+				if (optsound)explosion.play();
 			}
 			//bullets with bullet booster
 			if (s2.getGlobalBounds().intersects(bb.getGlobalBounds())) {
 				bb.setPosition(rand() % 1200, -6480);
 				fired = 0;
 				s2.setPosition(1800, 800);
-				explosion.play();
+				if (optsound)explosion.play();
 			}
 			//#################################################
 
@@ -841,7 +1052,7 @@ int main()
 				reqtime += 25;
 			}
 			//#################################################
-			survcnt = survt.getElapsedTime().asSeconds();
+			survcnt = survt.getElapsedTime().asSeconds()-yarab;
 		}
 		//bebo
 		//navigation after losing
@@ -861,20 +1072,22 @@ int main()
 		{	//new added numbers
 			if (nav == 1 || nav == 3 || nav == 4 || nav == 21 || nav == 22 || nav == 23)nav = 0;// go from campaign menu to main menu // new added credits and how to play and highscores
 			if (nav == 2 || nav == 11 || nav == 12 || nav == 13)  pause = 1; //pause the game
-			if (nav == 32 || nav == 31) { music.stop(); main(); } // play again
+			if (nav == 32 || nav == 31) { music.pause(); main(); } // play again
 
 		}
 		// new pause menu loop
 		if (pause)
 		{
-			RenderWindow pausewindow(VideoMode(480, 240), "Pause Menu");
-
+			RenderWindow pausewindow(VideoMode(480, 240), "Pause Menu", Style::None);//^^^^^^^
+			timegap.restart();
 			while (pausewindow.isOpen())
 			{
+				timeg = timegap.getElapsedTime().asSeconds();
 				while (pausewindow.pollEvent(event))
 				{
 					if (event.type == Event::Closed)
 					{
+						yarab += timeg;
 						pausewindow.close();
 						pause = 0;
 					}
@@ -887,50 +1100,121 @@ int main()
 					else 			color = 0;
 
 					if (!color)		pmt[0].setFillColor(Color::White);
-					if (color)		pmt[0].setFillColor(Color::Blue);
+					if (color)		pmt[0].setFillColor(Color::Red);
 				}
 				// change color of Main Menu text
 				{
-					if (mousepos1.x > 0 && mousepos1.x < 235 && mousepos1.y>160 && mousepos1.y < 197)
+					if (mousepos1.x > 0 && mousepos1.x < 235 && mousepos1.y>190 && mousepos1.y < 227)
 						color = 1;
 					else 			color = 0;
 
 					if (!color)		pmt[1].setFillColor(Color::White);
-					if (color)		pmt[1].setFillColor(Color::Blue);
+					if (color)		pmt[1].setFillColor(Color::Red);
 				}
-				if (Mouse::isButtonPressed(Mouse::Left))
+				//^change color of Options text ^^^^
 				{
-					if (mousepos1.x > 0 && mousepos1.x < 155 && mousepos1.y>11 && mousepos1.y < 50)  //resume game
+					if (mousepos1.x > 0 && mousepos1.x < 145 && mousepos1.y>100 && mousepos1.y < 138)
+						color = 1;
+					else			color = 0;
+					if (!color)		pmt[2].setFillColor(Color::White);
+					if (color)		pmt[2].setFillColor(Color::Red);
+
+				}
+				if (Mouse::isButtonPressed(Mouse::Left))//changed all conditions ^^^^^
+				{
+					if (mousepos1.x > 0 && mousepos1.x < 155 && mousepos1.y>11 && mousepos1.y < 50 && optionsB == 0)  //resume game
 					{
+						yarab += timeg;
 						pause = 0;
 						pausewindow.close();
 					}
-					if (mousepos1.x > 0 && mousepos1.x < 235 && mousepos1.y>160 && mousepos1.y < 197)  //back to main menu
+					if (mousepos1.x > 0 && mousepos1.x < 145 && mousepos1.y>100 && mousepos1.y < 138 && optionsB == 0)  //options
+					{
+						optionsB = 1;//^^^^^
+					}
+					if (mousepos1.x > 0 && mousepos1.x < 235 && mousepos1.y>190 && mousepos1.y < 227 && optionsB == 0)  //back to main menu
 					{
 						pause = 0;
 						pausewindow.close();
 						main();
 					}
+					if (mousepos1.x > 260 && mousepos1.x < 310 && mousepos1.y>10 && mousepos1.y < 60 && optionsB == 1)//^^^^
+					{
+						if (opt.getElapsedTime().asSeconds() > 0.5)
+						{
+							if (optmusic) {
+								optmusic = 0;
+								music.pause();
+							}
+							else {
+								optmusic = 1;
+								music.play();
+							}
+							opt.restart();
+						}
+					}
+					if (mousepos1.x > 260 && mousepos1.x < 310 && mousepos1.y>90 && mousepos1.y < 140 && optionsB == 1)//^^^^
+					{
+						if (opt.getElapsedTime().asSeconds() > 0.5)
+						{
+							if (optsound)optsound = 0;
+							else optsound = 1;
+							opt.restart();
+						}
+					}
 
+				}
+				if (Keyboard::isKeyPressed(Keyboard::Escape))//^^^^
+				{
+					optionsB = 0;
 				}
 
 
 				pausewindow.clear();
-				pausewindow.draw(pmt[0]);
-				pausewindow.draw(pmt[1]);
+				pausewindow.draw(PauseMenuBG);
+				if (!optionsB)//^^^^
+				{
+					pausewindow.draw(pmt[0]);
+					pausewindow.draw(pmt[1]);
+					pausewindow.draw(pmt[2]);
+				}
+				if (optionsB)//^^^^
+				{
+					pausewindow.draw(options[0]);	pausewindow.draw(options[1]);	pausewindow.draw(options[2]);
+					pausewindow.draw(BOX1);			pausewindow.draw(BOX2);
+					if (optmusic) { pausewindow.draw(CHECK1); }
+					if (optsound) { pausewindow.draw(CHECK2); }
+				}
 				pausewindow.display();
+
 
 			}
 		}
 		//#################################################
+		if (levelup) {
+			if (arrowcnt.getElapsedTime().asSeconds() > 0.25) {
+				zz++;
+				zz %= 3;
+				arrow.setTextureRect(IntRect(zz * 200, 0, 200, 188));
+				arrowcnt.restart();
+
+			}
+		}
+		//#########################
+		dmg.setString("Damage taken: " + to_string(dmgt));
+		nuken.setString("Number of nukes destroyed: " + to_string(nukecnt));
+		bombn.setString("Number of bombs destroyed:" + to_string(bombcnt));
+
 
 		//#################### draw ###################
 		window.clear();
 		//faisl
 		//main menu
+		window.draw(gbg);
+
 		if (nav == 0) // main menu
 		{
-			window.draw(ibg);
+
 			for (int i = 3; i < 8; i++) // new changed numbers
 			{
 				window.draw(textCover[i]);
@@ -940,12 +1224,15 @@ int main()
 		}
 		if (nav == 1) // campaign menu
 		{
-			window.draw(ibg);
+
 			for (int i = 0; i < 3; i++)
 			{
-				window.draw(textCover[i]);
+				window.draw(lvlbw[i]);
+				window.draw(lvlcolored[i]);
 				window.draw(mmt[i]);
+
 			}
+
 		}
 		if (nav == 3) //credits
 		{
@@ -992,9 +1279,9 @@ int main()
 		//#################################################
 
 		//####### game  #######
-		if (nav == 2 || nav == 11 || nav == 12 || nav == 13)
+		if (nav == 2 || nav == 11 || nav == 12 || nav == 13 || nav == 0)
 		{
-			window.draw(gbg);
+
 			//hamed
 			window.draw(s1);
 			window.draw(s2);
@@ -1014,13 +1301,15 @@ int main()
 				{
 					window.draw(sh[i]);
 				}
-				window.draw(ss);//sheild
+
 				//#################################################
 				//andrew
-				window.draw(r1);// sheild bar
-				window.draw(r2);// health bar
-				// text for score health sheild
-				window.draw(score);	window.draw(health);
+				if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
+					window.draw(r1);// sheild bar
+					window.draw(r2);// health bar
+					// text for score health sheild
+					window.draw(score);	window.draw(health);
+				}
 				if (shon)
 					window.draw(sheild);
 				//#################################################
@@ -1037,13 +1326,32 @@ int main()
 
 			}
 		}
+		if (nav == 11 && levelup) {
+			window.draw(phase1[3]);
+			for (int i = 0; i < 4; i++) {
+				if (paint[i]) {
+					window.draw(phase1[i]);
+				}
+			}
+		}
+		if (nav == 12 && levelup) {
+			window.draw(phase2[3]);
+			for (int i = 0; i < 4; i++) {
+				if (paint[i]) {
+					window.draw(phase2[i]);
+				}
+			}
+		}
 		if (nav == 2)
 		{	//boosters & boosters' icons
+			window.draw(survtt);
+			survtt.setString(to_string(survcnt / 60) + ":" + to_string(survcnt % 60));
 			window.draw(tb); 	window.draw(bb);
 			if (tbb)
 				window.draw(tbi);
 			if (bbb)
 				window.draw(bbi);
+			window.draw(ss);//sheild
 		}
 		//faisl
 		//#######  ending  #######
@@ -1067,15 +1375,19 @@ int main()
 			window.draw(endgame[3]);
 			window.draw(backToMain);
 		}
-		if (s >= reqscore) {
-			if (nav == 11 || nav == 12 || nav == 13) {
-				window.draw(movegame);
-			}
+		if (levelup) {
+			window.draw(arrow);
 		}
+		if (nav == 31 || nav == 32) {
+			window.draw(dmg);
+			window.draw(bombn);
+			window.draw(nuken);
+		}
+
+
 		//#################################################
 
 		window.display();
 	}
 	return 0;
 }
-
