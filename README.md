@@ -87,8 +87,7 @@ int main()
 	bool emptyCellBool = false;
 	bool pwMatchBool = false;
 	bool available = true;
-	account accToLoad, accToGet, accToCheck;
-	account arr[2] = {};
+	account accToGet,accToLoad;
 	//random movement in the background
 	bool random = 1;
 	int mode = 0;
@@ -635,10 +634,10 @@ int main()
 							account* acc = *line;
 							if (acc->username == un && acc->password == pw) { 
 								nav = 0;
-								cout << acc->username << endl;
-								cout << acc->email << endl;
-								cout << acc->password << endl;
-								cout << acc->score << endl;
+								accToGet.username = acc->username;
+								accToGet.email = acc->email;
+								accToGet.password = acc->password;
+								accToGet.score = acc->score;
 							}
 							else {
 								invalidBool = true;
@@ -721,6 +720,7 @@ int main()
 								accToLoad.password = pw;
 								accToLoad.score = 0;
 								load(accToLoad, binFilePath);
+								nav = 0;
 							}
 						}
 						else {
