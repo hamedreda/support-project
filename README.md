@@ -263,7 +263,7 @@ int main()
 	HowtoPlay[0].setScale(0.2, 0.2);		HowtoPlay[0].setPosition(5, 180);
 	HowtoPlay[1].setScale(0.2, 0.2);		HowtoPlay[1].setPosition(65, 180);
 	HowtoPlay[2].setScale(0.7, 0.2);		HowtoPlay[2].setPosition(5, 340);
-	HowtoPlay[3].setScale(0.14, 0.14);		HowtoPlay[3].setPosition(40, 100);
+	HowtoPlay[3].setScale(0.4, 0.4);		HowtoPlay[3].setPosition(40, 100);
 	HowtoPlay[4].setScale(0.04, 0.04);		HowtoPlay[4].setPosition(30, 220);
 	HowtoPlay[5].setScale(0.03, 0.03);		HowtoPlay[5].setPosition(25, 335);
 	HowtoPlay[6].setScale(0.06, 0.06);		HowtoPlay[6].setPosition(40, 460);
@@ -306,11 +306,11 @@ int main()
 		htp23[i].setStyle(Text::Bold);
 	}
 	htp23[0].setString("Pickups");		htp23[0].setCharacterSize(80);		htp23[0].setPosition(520, 0);	htp23[0].setFillColor(Color::Blue);
-	htp23[1].setString("apple : regenerates health");						htp23[1].setPosition(169, 100);
+	htp23[1].setString("ScrewDriver : regenerates health");					htp23[1].setPosition(169, 100);
 	htp23[2].setString("armor : puts shield on tank");						htp23[2].setPosition(169, 220);
 	htp23[3].setString("accelrator : increase tank velocity");				htp23[3].setPosition(169, 340);
 	htp23[4].setString("thunder : increase bullet velocity");				htp23[4].setPosition(169, 460);
-	htp23[5].setString("bomb : does 10 damage");							htp23[5].setPosition(150, 580);
+	htp23[5].setString("bomb : does 5 damage");								htp23[5].setPosition(150, 580);
 	htp23[6].setString("nuke : does 30 damage");							htp23[6].setPosition(789, 580);
 
 	//#################################################
@@ -331,19 +331,20 @@ int main()
 	pmt[1].setString("Main Menu");	pmt[1].setPosition(0, 180);
 	pmt[2].setString("Options");	pmt[2].setPosition(0, 90);//^^^^
 	//^^^^
-	options[0].setString("Music");		options[0].setPosition(10, 10);
-	options[1].setString("Sound FX");	options[1].setPosition(10, 90);
-	options[2].setString("press backspace to go back");	options[2].setPosition(0, 200);	options[2].setCharacterSize(30);
+	options[0].setString("Music");							options[0].setPosition(10, 10);
+	options[1].setString("Sound FX");						options[1].setPosition(10, 90);
+	options[2].setString("press backspace to go back");		options[2].setPosition(0, 200);	options[2].setCharacterSize(30);
 	Texture box, check; box.loadFromFile("empty-box1.png"); check.loadFromFile("check-mark.png");
 	Sprite BOX1,BOX2, CHECK1,CHECK2;  
-	BOX1.setPosition(260,10 );	 BOX1.setScale(1,1 );		BOX1.setTexture(box);
-	BOX2.setPosition(260, 90);	 BOX2.setScale(1, 1);		BOX2.setTexture(box);
+	BOX1.setPosition(260,10);	 BOX1.setScale(1,1);		BOX1.setTexture(box);
+	BOX2.setPosition(260,90);	 BOX2.setScale(1,1);		BOX2.setTexture(box);
 	CHECK1.setPosition(265,15);	 CHECK1.setScale(0.7,0.7);	CHECK1.setTexture(check);
-	CHECK2.setPosition(265,95); CHECK2.setScale(0.7, 0.7);	CHECK2.setTexture(check);
+	CHECK2.setPosition(265,95);  CHECK2.setScale(0.7,0.7);	CHECK2.setTexture(check);
 
 	Texture pausemenu; pausemenu.loadFromFile("camo.jpg");
 	Sprite PauseMenuBG; PauseMenuBG.setTexture(pausemenu);
 	bool optsound = 1, optmusic = 1,optionsB=0;
+	Clock opt;
 	
 	//#################################################
 
@@ -363,7 +364,7 @@ int main()
 
 	music.openFromFile("Game audio1.wav");
 	music.setLoop("Game audio1.wav");
-	music.play();
+	
 	//#################################################
 	////arrowww
 	Sprite arrow;
@@ -396,6 +397,8 @@ int main()
 
 	while (window.isOpen())
 	{
+		if (optmusic)music.play();//^^^^
+		else music.pause();
 		if (pass == 1)
 			passed[0] = 1;
 		if (pass == 2)
@@ -404,6 +407,7 @@ int main()
 			a = 250, b = 0;
 			h = 100, shi = 0, s = 0;
 		}
+		
 		sheild.setString(to_string(shi));
 		score.setString(to_string(s));
 		health.setString(to_string(h));
@@ -438,7 +442,7 @@ int main()
 				if (mode == 2 && fired == 0) {
 					fired = 1;
 					s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
-					shoot.play();
+					if (optsound)shoot.play();
 				}
 				if (fired) {
 					s2.move(0, -10 * bc);
@@ -663,7 +667,7 @@ int main()
 				if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
 					fired = 1;
 					s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
-					shoot.play();
+					if(optsound)shoot.play();
 				}
 				//repeats bullets's movement
 				if (fired) {
@@ -737,7 +741,7 @@ int main()
 						h -= 10;
 						a -= 25;
 					}
-					explosion.play();
+					if (optsound)explosion.play();
 				}
 			}
 			//nuke with tank
@@ -760,7 +764,7 @@ int main()
 						h -= 30;
 						a -= 75;
 					}
-					explosion.play();
+					if (optsound)explosion.play();
 				}
 			}
 			//apple with the tank
@@ -795,7 +799,7 @@ int main()
 					fired = 0;
 					s2.setPosition(800, 800);
 					collided2[i] = 1;
-					explosion.play();
+					if (optsound)explosion.play();
 					nukecnt++;
 				}
 			}
@@ -809,7 +813,7 @@ int main()
 					s += 10;
 					fired = 0;
 					s2.setPosition(800, 800);
-					explosion.play();
+					if (optsound)explosion.play();
 					bombcnt++;
 				}
 			}
@@ -821,7 +825,7 @@ int main()
 					sh[i].setPosition(rand() % 1200, -3600);
 					fired = 0;
 					s2.setPosition(1800, 800);
-					explosion.play();
+					if (optsound)explosion.play();
 				}
 			}
 			//bullets with shields
@@ -829,7 +833,7 @@ int main()
 				ss.setPosition(rand() % 1200, -5040);
 				fired = 0;
 				s2.setPosition(1800, 800);
-				explosion.play();
+				if (optsound)explosion.play();
 			}
 			//#################################################
 
@@ -926,14 +930,14 @@ int main()
 				tb.setPosition(rand() % 1200, -6480);
 				fired = 0;
 				s2.setPosition(1800, 800);
-				explosion.play();
+				if (optsound)explosion.play();
 			}
 			//bullets with bullet booster
 			if (s2.getGlobalBounds().intersects(bb.getGlobalBounds())) {
 				bb.setPosition(rand() % 1200, -6480);
 				fired = 0;
 				s2.setPosition(1800, 800);
-				explosion.play();
+				if (optsound)explosion.play();
 			}
 			//#################################################
 
@@ -1041,13 +1045,21 @@ int main()
 					}
 					if (mousepos1.x > 260 && mousepos1.x < 310 && mousepos1.y>10 && mousepos1.y < 60 && optionsB == 1)//^^^^
 					{
-						if (optmusic) optmusic = 0;
-						if (!optmusic) optmusic = 1;
+						if (opt.getElapsedTime().asSeconds() > 0.5)
+						{
+							if (optmusic) optmusic = 0;
+							else optmusic = 1;
+							opt.restart();
+						}
 					}
 					if (mousepos1.x > 260 && mousepos1.x < 310 && mousepos1.y>90 && mousepos1.y < 140 && optionsB == 1)//^^^^
 					{
-						if (optsound)optsound = 0;
-						if (!optsound)optsound = 1;
+						if (opt.getElapsedTime().asSeconds() > 0.5)
+						{
+							if (optsound)optsound = 0;
+							else optsound = 1;
+							opt.restart();
+						}
 					}
 					
 				}if (Keyboard::isKeyPressed(Keyboard::BackSpace))//^^^^
@@ -1068,13 +1080,15 @@ int main()
 				{
 					pausewindow.draw(options[0]);	pausewindow.draw(options[1]);	pausewindow.draw(options[2]);
 					pausewindow.draw(BOX1);			pausewindow.draw(BOX2);
-					if (optmusic) { pausewindow.draw(CHECK1); }
+					if (optmusic) { pausewindow.draw(CHECK1);  }
+
 					if (optsound) { pausewindow.draw(CHECK2); }
 				}
 				pausewindow.display();
 				
 
 			}
+			
 		}
 		//#################################################
 		if (levelup) {
