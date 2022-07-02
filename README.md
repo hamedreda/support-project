@@ -7,19 +7,20 @@ bool passed[2] = {};
 
 // tebo
 Sprite b1[10], b2[5], sh[3], ss;// spr arr FOR BOMBS& SHIELD,apple
-void setter() { //bomb1 
-	for (int i = 0; i < 10; i++) { b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //nuke 
-	for (int i = 0; i < 5; i++) { b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //apple 
+void setter() {
+	for (int i = 0; i < 10; i++) { b1[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); }//bomb
+	for (int i = 0; i < 5; i++) { b2[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //nuke
 	for (int i = 0; i < 3; i++) { sh[i].setPosition(rand() % 1200, -rand() % 2000 * (rand() % 5 + 1)); } //SHIELD 
-	ss.setPosition(rand() % 1200, -5040); shi = 0; s = 0; b = 0;
+	ss.setPosition(rand() % 1200, -5040); shi = 0; s = 0; b = 0;//apple 
 }
 Music music;
 //################################################# 
 RenderWindow window(VideoMode(1280, 720), "Tanks"); //WINDOW
 int main()
 {
+	Font f; f.loadFromFile("font.ttf"); //FONT
 	window.setFramerateLimit(40); //fps //random movement in the background 
-	bool random = 1; int mode = 0; Clock movement; //andrew
+	bool random = 1, begin = 0, paint[4] = {}; int mode = 0; Clock movement; //andrew
 	bool shon = 0; //bool for sheild
 	RectangleShape r1(Vector2f(b, 20)); r1.setPosition(1005, 50); r1.setFillColor(Color{ 200,200,200 }); //SHEILD BAR 
 	RectangleShape r2(Vector2f(a, 20)); r2.setPosition(1005, 15); r2.setFillColor(Color::Red); //HEALTH BAR //#################################################
@@ -30,9 +31,10 @@ int main()
 	//hamed
 	int reqscore = 200;
 	int tc = 1, bc = 1; //speed const.(boosters)
-	Clock tbc, bbc; // clock for boosters
+	Clock tbc, bbc, celebration; // clock for boosters
 	bool fired = 0, tbb = 0, bbb = 0; //bools for bullet,boosters
 	Clock survt; int reqtime = 25, speed = 0; //survival time&speed
+	Text survtt;	survtt.setFont(f); survtt.setCharacterSize(50);	survtt.setPosition(300, -5);
 	int survcnt = 0;
 	//#################################################
 
@@ -57,7 +59,6 @@ int main()
 	}
 	//#################################################
 
-	Font f; f.loadFromFile("font.ttf"); //FONT
 
 	//andrew
 							// TEXT FOR SCORE & HEALTH & SHEILD :
@@ -128,7 +129,7 @@ int main()
 	tbi.setScale(0.01, 0.01);	bbi.setScale(0.025, 0.025);
 	//#################################################
 
-	
+
 	//faisl
 
 		// 4- game's starting & ending txt + intro & game bg 
@@ -142,41 +143,56 @@ int main()
 	ending.loadFromFile("endgame.ttf");
 	Font moving;
 	moving.loadFromFile("chunk.otf");
-	Text endgame[4];  Text movegame;	Text backToMain;
+	Text endgame[4];	Text backToMain;
 	for (int i = 0; i < 4; i++) {
 		endgame[i].setFont(ending);
 		endgame[i].setCharacterSize(65);
 		endgame[i].setPosition(300, 200);
-		endgame[i].setFillColor(sf::Color::Red);
+		endgame[i].setFillColor(sf::Color::White);
 	}
 	endgame[0].setString("Well done soldier");
 	endgame[1].setString("Mission failed succesfully");
 	endgame[2].setPosition(300, 100);
 	endgame[3].setPosition(300, 200);
-	movegame.setFont(moving);
-	movegame.setCharacterSize(57);
-	movegame.setPosition(85, -10);
-	movegame.setFillColor(sf::Color::Blue);
-	movegame.setString("Move to the right & Press enter");
 	backToMain.setFont(ending);
 	backToMain.setCharacterSize(50);
-	backToMain.setFillColor(Color::Red);
+	backToMain.setFillColor(Color::White);
 	backToMain.setString("press Esc to go back to Main Menu");
 	backToMain.setPosition(300, 430);
 
 	// 5-  the cover that holds the text inside it & lvl photos
-	Texture bw[3], colored[3];
+	Texture bw[3], colored[3], phases1[4], phases2[4];
 	bw[0].loadFromFile("lvl1bw.jpeg");
 	bw[1].loadFromFile("lvl2bw.jpeg");
 	bw[2].loadFromFile("lvl3bw.jpeg");
 	colored[0].loadFromFile("lvl1colored.jpeg");
 	colored[1].loadFromFile("lvl2colored.jpeg");
 	colored[2].loadFromFile("lvl3colored.jpeg");
-	Sprite lvlbw[3], lvlcolored[3];
+	phases1[0].loadFromFile("phase0.jpeg");
+	phases1[1].loadFromFile("phase1.jpeg");
+	phases1[2].loadFromFile("phase2.jpeg");
+	phases1[3].loadFromFile("phase3.jpeg");
+	phases2[0].loadFromFile("phases0.jpeg");
+	phases2[1].loadFromFile("phases1.jpeg");
+	phases2[2].loadFromFile("phases2.jpeg");
+	phases2[3].loadFromFile("phases3.jpeg");
+
+	Sprite lvlbw[3], lvlcolored[3], phase1[4], phase2[4];
 	for (int i = 0; i < 3; i++) {
 		lvlbw[i].setTexture(bw[i]);
 		lvlcolored[i].setTexture(colored[i]);
 	}
+	for (int i = 0; i < 4; i++) {
+		phase1[i].setTexture(phases1[i]);
+		phase1[i].setPosition(325, 75);
+		phase1[i].setScale(0.5, 0.5);
+		phase2[i].setTexture(phases2[i]);
+		phase2[i].setPosition(325, 75);
+		phase2[i].setScale(0.5, 0.5);
+	}
+
+
+
 	Texture textcover;
 	textcover.loadFromFile("TextCover.png");
 	Sprite textCover[8];
@@ -306,7 +322,7 @@ int main()
 		htp23[i].setStyle(Text::Bold);
 	}
 	htp23[0].setString("Pickups");		htp23[0].setCharacterSize(80);		htp23[0].setPosition(520, 0);	htp23[0].setFillColor(Color::Blue);
-	htp23[1].setString("ScrewDriver : regenerates health");					htp23[1].setPosition(169, 100);
+	htp23[1].setString("ScrewDriver : fixes the tank");					htp23[1].setPosition(169, 100);
 	htp23[2].setString("armor : puts shield on tank");						htp23[2].setPosition(169, 220);
 	htp23[3].setString("accelrator : increase tank velocity");				htp23[3].setPosition(169, 340);
 	htp23[4].setString("thunder : increase bullet velocity");				htp23[4].setPosition(169, 460);
@@ -317,7 +333,7 @@ int main()
 
 	//bebo
 	//pause menu  ^^^^
-	Text pmt[3],options[3];//^^^^ added options array and pmt increased
+	Text pmt[3], options[3];//^^^^ added options array and pmt increased
 	for (int i = 0; i < 3; i++)
 	{
 		pmt[i].setFont(font);
@@ -331,21 +347,21 @@ int main()
 	pmt[1].setString("Main Menu");	pmt[1].setPosition(0, 180);
 	pmt[2].setString("Options");	pmt[2].setPosition(0, 90);//^^^^
 	//^^^^
-	options[0].setString("Music");							options[0].setPosition(10, 10);
-	options[1].setString("Sound FX");						options[1].setPosition(10, 90);
-	options[2].setString("press backspace to go back");		options[2].setPosition(0, 200);	options[2].setCharacterSize(30);
+	options[0].setString("Music");		options[0].setPosition(10, 10);
+	options[1].setString("Sound FX");	options[1].setPosition(10, 90);
+	options[2].setString("press backspace to go back");	options[2].setPosition(0, 200);	options[2].setCharacterSize(30);
 	Texture box, check; box.loadFromFile("empty-box1.png"); check.loadFromFile("check-mark.png");
-	Sprite BOX1,BOX2, CHECK1,CHECK2;  
-	BOX1.setPosition(260,10);	 BOX1.setScale(1,1);		BOX1.setTexture(box);
-	BOX2.setPosition(260,90);	 BOX2.setScale(1,1);		BOX2.setTexture(box);
-	CHECK1.setPosition(265,15);	 CHECK1.setScale(0.7,0.7);	CHECK1.setTexture(check);
-	CHECK2.setPosition(265,95);  CHECK2.setScale(0.7,0.7);	CHECK2.setTexture(check);
+	Sprite BOX1, BOX2, CHECK1, CHECK2;
+	BOX1.setPosition(260, 10);	 BOX1.setScale(1, 1);		BOX1.setTexture(box);
+	BOX2.setPosition(260, 90);	 BOX2.setScale(1, 1);		BOX2.setTexture(box);
+	CHECK1.setPosition(265, 15);	 CHECK1.setScale(0.7, 0.7);	CHECK1.setTexture(check);
+	CHECK2.setPosition(265, 95); CHECK2.setScale(0.7, 0.7);	CHECK2.setTexture(check);
 
 	Texture pausemenu; pausemenu.loadFromFile("camo.jpg");
 	Sprite PauseMenuBG; PauseMenuBG.setTexture(pausemenu);
-	bool optsound = 1, optmusic = 1,optionsB=0;
+	bool optsound = 1, optmusic = 1, optionsB = 0;
 	Clock opt;
-	
+
 	//#################################################
 
 	// haitham
@@ -360,6 +376,11 @@ int main()
 	music1.loadFromFile("explosion.wav");
 	Sound explosion;
 	explosion.setBuffer(music1);
+	//celebration
+	SoundBuffer win;
+	win.loadFromFile("victory.wav");
+	Sound victory;
+	victory.setBuffer(win);
 	//game
 
 	music.openFromFile("Game audio1.wav");
@@ -384,15 +405,15 @@ int main()
 	Text bombn, nuken, dmg;
 	bombn.setFont(ending);
 	bombn.setString("Number of bombs destroyed:" + to_string(bombcnt));
-	bombn.setFillColor(Color::Red);
+	bombn.setFillColor(Color::White);
 	bombn.setPosition(300, 550);
 	nuken.setFont(ending);
 	nuken.setString("Number of nukes destroyed: " + to_string(nukecnt));
-	nuken.setFillColor(Color::Red);
+	nuken.setFillColor(Color::White);
 	nuken.setPosition(300, 600);
 	dmg.setFont(ending);
 	dmg.setString("Damage taken: " + to_string(dmgt));
-	dmg.setFillColor(Color::Red);
+	dmg.setFillColor(Color::White);
 	dmg.setPosition(300, 650);
 
 	while (window.isOpen())
@@ -407,7 +428,6 @@ int main()
 			a = 250, b = 0;
 			h = 100, shi = 0, s = 0;
 		}
-		
 		sheild.setString(to_string(shi));
 		score.setString(to_string(s));
 		health.setString(to_string(h));
@@ -602,15 +622,48 @@ int main()
 				pass = 1;
 				setter();
 				levelup = 1;
+				begin = 1;
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
+			if (begin) {
+				celebration.restart();
+				if (optsound)victory.play();
+				music.stop();
+				begin = 0;
+			}
+			if (s1.getPosition().x >= 1280)
 			{
 				bound = 1;
 				s1.setPosition(20, 600);
+				if(optmusic)music.play();
 				s = 0;
 				nav = 12;
 				levelup = 0;
 			}
+			if (celebration.getElapsedTime().asSeconds() < 0.5) {
+				paint[0] = 1;
+			}
+			else {
+				paint[0] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 0.5 && celebration.getElapsedTime().asSeconds() < 1) {
+				paint[1] = 1;
+			}
+			else {
+				paint[1] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 1 && celebration.getElapsedTime().asSeconds() < 1.5) {
+				paint[2] = 1;
+			}
+			else {
+				paint[2] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 1.5) {
+				paint[3] == 1;
+			}
+			else {
+				paint[3] == 0;
+			}
+
 		}
 		if (nav == 12) {
 			gbg.setTexture(lvl2);
@@ -621,15 +674,48 @@ int main()
 				levelup = 1;
 				bound = 0;
 				setter();
+				begin = 1;
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Enter) && s1.getPosition().x >= 1280)
+			if (begin) {
+				celebration.restart();
+				if (optsound)victory.play();
+				if(optmusic)music.stop();
+				begin = 0;
+			}
+			if (s1.getPosition().x >= 1280)
 			{
 				bound = 1;
 				s1.setPosition(20, 600);
+				if(optmusic)music.play();
 				s = 0;
-				levelup = 0;
 				nav = 13;
+				levelup = 0;
 			}
+			if (celebration.getElapsedTime().asSeconds() < 0.5) {
+				paint[0] = 1;
+			}
+			else {
+				paint[0] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 0.5 && celebration.getElapsedTime().asSeconds() < 1) {
+				paint[1] = 1;
+			}
+			else {
+				paint[1] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 1 && celebration.getElapsedTime().asSeconds() < 1.5) {
+				paint[2] = 1;
+			}
+			else {
+				paint[2] = 0;
+			}
+			if (celebration.getElapsedTime().asSeconds() > 1.5) {
+				paint[3] == 1;
+			}
+			else {
+				paint[3] == 0;
+			}
+
 		}
 		if (nav == 13)
 		{
@@ -667,7 +753,7 @@ int main()
 				if (Keyboard::isKeyPressed(Keyboard::Space) && fired == 0) {
 					fired = 1;
 					s2.setPosition(s1.getPosition().x + 78 / 2.0, 600);
-					if(optsound)shoot.play();
+					if (optsound)shoot.play();
 				}
 				//repeats bullets's movement
 				if (fired) {
@@ -778,15 +864,18 @@ int main()
 				}
 			}
 			//shield with the tank
-			if (s1.getGlobalBounds().intersects(ss.getGlobalBounds())) {
-				ss.setPosition(rand() % 1200, -5040);
-				shi += 50;
-				if (shi > 100)
-					shi = 100;
-				b += 125;
-				if (b > 250)
-					b = 250;
-				shon = 1;
+			if (nav == 2) {
+				if (s1.getGlobalBounds().intersects(ss.getGlobalBounds())) {
+					ss.setPosition(rand() % 1200, -5040);
+					shi += 50;
+					if (shi > 100)
+						shi = 100;
+					b += 125;
+					if (b > 250)
+						b = 250;
+					shon = 1;
+				}
+
 			}
 
 			//bullet with nukes
@@ -810,7 +899,7 @@ int main()
 					//animation1[i].restart();
 					exp1[i].setPosition(b1[i].getPosition().x - 50, b1[i].getPosition().y - 30);
 					b1[i].setPosition(rand() % 1200, -rand() % 720 * (rand() % 5 + 1));
-					s += 10;
+					s += 5;
 					fired = 0;
 					s2.setPosition(800, 800);
 					if (optsound)explosion.play();
@@ -986,6 +1075,7 @@ int main()
 		// new pause menu loop
 		if (pause)
 		{
+			
 			RenderWindow pausewindow(VideoMode(480, 240), "Pause Menu", Style::None);//^^^^^^^
 
 			while (pausewindow.isOpen())
@@ -1024,7 +1114,7 @@ int main()
 					else			color = 0;
 					if (!color)		pmt[2].setFillColor(Color::White);
 					if (color)		pmt[2].setFillColor(Color::Red);
-				
+
 				}
 				if (Mouse::isButtonPressed(Mouse::Left))//changed all conditions ^^^^^
 				{
@@ -1037,7 +1127,7 @@ int main()
 					{
 						optionsB = 1;//^^^^^
 					}
-					if (mousepos1.x > 0 && mousepos1.x < 235 && mousepos1.y>190 && mousepos1.y < 227 && optionsB==0)  //back to main menu
+					if (mousepos1.x > 0 && mousepos1.x < 235 && mousepos1.y>190 && mousepos1.y < 227 && optionsB == 0)  //back to main menu
 					{
 						pause = 0;
 						pausewindow.close();
@@ -1061,7 +1151,7 @@ int main()
 							opt.restart();
 						}
 					}
-					
+
 				}if (Keyboard::isKeyPressed(Keyboard::BackSpace))//^^^^
 				{
 					optionsB = 0;
@@ -1080,15 +1170,13 @@ int main()
 				{
 					pausewindow.draw(options[0]);	pausewindow.draw(options[1]);	pausewindow.draw(options[2]);
 					pausewindow.draw(BOX1);			pausewindow.draw(BOX2);
-					if (optmusic) { pausewindow.draw(CHECK1);  }
-
+					if (optmusic) { pausewindow.draw(CHECK1); }
 					if (optsound) { pausewindow.draw(CHECK2); }
 				}
 				pausewindow.display();
-				
+
 
 			}
-			
 		}
 		//#################################################
 		if (levelup) {
@@ -1201,7 +1289,7 @@ int main()
 				{
 					window.draw(sh[i]);
 				}
-				window.draw(ss);//sheild
+
 				//#################################################
 				//andrew
 				if (nav == 2 || nav == 11 || nav == 12 || nav == 13) {
@@ -1226,13 +1314,32 @@ int main()
 
 			}
 		}
+		if (nav == 11 && levelup) {
+			window.draw(phase1[3]);
+			for (int i = 0; i < 4; i++) {
+				if (paint[i]) {
+					window.draw(phase1[i]);
+				}
+			}
+		}
+		if (nav == 12 && levelup) {
+			window.draw(phase2[3]);
+			for (int i = 0; i < 4; i++) {
+				if (paint[i]) {
+					window.draw(phase2[i]);
+				}
+			}
+		}
 		if (nav == 2)
 		{	//boosters & boosters' icons
+			window.draw(survtt);
+			survtt.setString(to_string(survcnt / 60) + ":" + to_string(survcnt % 60));
 			window.draw(tb); 	window.draw(bb);
 			if (tbb)
 				window.draw(tbi);
 			if (bbb)
 				window.draw(bbi);
+			window.draw(ss);//sheild
 		}
 		//faisl
 		//#######  ending  #######
@@ -1256,20 +1363,15 @@ int main()
 			window.draw(endgame[3]);
 			window.draw(backToMain);
 		}
-		if (s >= reqscore) {
-			if (nav == 11 || nav == 12 || nav == 13) {
-				window.draw(movegame);
-			}
-		}
 		if (levelup) {
 			window.draw(arrow);
-
 		}
 		if (nav == 31 || nav == 32) {
 			window.draw(dmg);
 			window.draw(bombn);
 			window.draw(nuken);
 		}
+
 
 		//#################################################
 
