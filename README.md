@@ -360,8 +360,8 @@ int main()
 	CHECK1.setPosition(265, 15);	 CHECK1.setScale(0.7, 0.7);	CHECK1.setTexture(check);
 	CHECK2.setPosition(265, 95); CHECK2.setScale(0.7, 0.7);	CHECK2.setTexture(check);
 
-	Texture pausemenu; pausemenu.loadFromFile("camo.jpg");
-	Sprite PauseMenuBG; PauseMenuBG.setTexture(pausemenu);
+	Texture pausemenu; pausemenu.loadFromFile("tankpause.jpg");
+	Sprite PauseMenuBG; PauseMenuBG.setTexture(pausemenu);	PauseMenuBG.setScale(0.444,0.3);
 	bool optsound = 1, optmusic = 1, optionsB = 0;
 	Clock opt;
 
